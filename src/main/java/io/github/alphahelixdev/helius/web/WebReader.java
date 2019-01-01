@@ -14,6 +14,7 @@ import org.apache.commons.logging.LogFactory;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.Objects;
 import java.util.logging.Level;
 
 public class WebReader {
@@ -27,14 +28,14 @@ public class WebReader {
 		java.util.logging.Logger.getLogger("com.gargoylesoftware.htmlunit").setLevel(Level.OFF);
 		java.util.logging.Logger.getLogger("org.apache.commons.httpclient").setLevel(Level.OFF);
 		
-		CLIENT.getOptions().setJavaScriptEnabled(true);
-		CLIENT.getOptions().setThrowExceptionOnScriptError(false);
-		CLIENT.getOptions().setThrowExceptionOnFailingStatusCode(false);
-		CLIENT.getOptions().setCssEnabled(false);
+		WebReader.getClient().getOptions().setJavaScriptEnabled(true);
+		WebReader.getClient().getOptions().setThrowExceptionOnScriptError(false);
+		WebReader.getClient().getOptions().setThrowExceptionOnFailingStatusCode(false);
+		WebReader.getClient().getOptions().setCssEnabled(false);
 		
-		CLIENT.setIncorrectnessListener((message, origin) -> {});
+		WebReader.getClient().setIncorrectnessListener((message, origin) -> {});
 		
-		CLIENT.setCssErrorHandler(new CSSErrorHandler() {
+		WebReader.getClient().setCssErrorHandler(new CSSErrorHandler() {
 			@Override
 			public void warning(CSSParseException exception) throws CSSException {
 			}
@@ -48,7 +49,7 @@ public class WebReader {
 			}
 		});
 		
-		CLIENT.setJavaScriptErrorListener(new JavaScriptErrorListener() {
+		WebReader.getClient().setJavaScriptErrorListener(new JavaScriptErrorListener() {
 			@Override
 			public void timeoutError(HtmlPage arg0, long arg1, long arg2) {
 			}
@@ -66,7 +67,7 @@ public class WebReader {
 			}
 		});
 		
-		CLIENT.setHTMLParserListener(new HTMLParserListener() {
+		WebReader.getClient().setHTMLParserListener(new HTMLParserListener() {
 			
 			@Override
 			public void error(String message, URL url, String html, int line, int column, String key) {
@@ -80,43 +81,60 @@ public class WebReader {
 		});
 	}
 	
-	private String url;
+	private final String url;
 	private String cachedHTML;
 	
 	public WebReader(String url) {
 		this.url = url;
 	}
 	
+	public static int getDefaultTimeOut() {
+		return WebReader.DEFAULT_TIME_OUT;
+	}
+	
 	public String getSyncHTML() throws IOException {
-		return getSyncHTML("", DEFAULT_TIME_OUT);
+		return this.getSyncHTML("", DEFAULT_TIME_OUT);
 	}
 	
 	public String getSyncHTML(String subPage, int millis) throws IOException {
-		HtmlPage page = CLIENT.getPage(this.url + "/" + subPage);
+		HtmlPage page = WebReader.getClient().getPage(this.url + "/" + subPage);
 		
-		CLIENT.waitForBackgroundJavaScript(millis);
+		WebReader.getClient().waitForBackgroundJavaScript(millis);
 		
-		this.cachedHTML = page.asXml();
+		this.setCachedHTML(page.asXml());
 		
+		return this.getCachedHTML();
+	}
+	
+	public static WebClient getClient() {
+		return WebReader.CLIENT;
+	}
+	
+	public String getCachedHTML() {
 		return this.cachedHTML;
 	}
 	
+	public WebReader setCachedHTML(String cachedHTML) {
+		this.cachedHTML = cachedHTML;
+		return this;
+	}
+	
 	public String getSyncHTML(String subPage) throws IOException {
-		return getSyncHTML(subPage, DEFAULT_TIME_OUT);
+		return this.getSyncHTML(subPage, DEFAULT_TIME_OUT);
 	}
 	
 	public String getSyncHTML(int millis) throws IOException {
-		return getSyncHTML("", millis);
+		return this.getSyncHTML("", millis);
 	}
 	
 	public WebReader getHTML(WebConsumer<String> html) {
-		return getHTML("", DEFAULT_TIME_OUT, html);
+		return this.getHTML("", DEFAULT_TIME_OUT, html);
 	}
 	
 	public WebReader getHTML(String subPage, int millis, WebConsumer<String> html) {
 		new Thread(() -> {
 			try {
-				html.success(getSyncHTML(subPage, millis));
+				html.success(this.getSyncHTML(subPage, millis));
 			} catch(IOException e) {
 				html.fail(e);
 			}
@@ -126,42 +144,42 @@ public class WebReader {
 	}
 	
 	public WebReader getHTML(String subPage, WebConsumer<String> html) {
-		return getHTML(subPage, DEFAULT_TIME_OUT, html);
+		return this.getHTML(subPage, DEFAULT_TIME_OUT, html);
 	}
 	
 	public WebReader getHTML(int millis, WebConsumer<String> html) {
-		return getHTML("", millis, html);
+		return this.getHTML("", millis, html);
 	}
 	
 	public WebReader customSyncQuery(WebConsumer<HtmlPage> htmlPage) throws IOException {
-		return customSyncQuery("", DEFAULT_TIME_OUT, htmlPage);
+		return this.customSyncQuery("", DEFAULT_TIME_OUT, htmlPage);
 	}
 	
 	public WebReader customSyncQuery(String subPage, int millis, WebConsumer<HtmlPage> htmlPage) throws IOException {
-		HtmlPage page = CLIENT.getPage(this.url + "/" + subPage);
+		HtmlPage page = WebReader.getClient().getPage(this.url + "/" + subPage);
 		
-		CLIENT.waitForBackgroundJavaScript(millis);
+		WebReader.getClient().waitForBackgroundJavaScript(millis);
 		
 		htmlPage.success(page);
 		return this;
 	}
 	
 	public WebReader customSyncQuery(String subPage, WebConsumer<HtmlPage> htmlPage) throws IOException {
-		return customSyncQuery(subPage, DEFAULT_TIME_OUT, htmlPage);
+		return this.customSyncQuery(subPage, DEFAULT_TIME_OUT, htmlPage);
 	}
 	
 	public WebReader customSyncQuery(int millis, WebConsumer<HtmlPage> htmlPage) throws IOException {
-		return customSyncQuery("", millis, htmlPage);
+		return this.customSyncQuery("", millis, htmlPage);
 	}
 	
 	public WebReader customQuery(WebConsumer<HtmlPage> htmlPage) {
-		return customQuery("", DEFAULT_TIME_OUT, true, htmlPage);
+		return this.customQuery("", DEFAULT_TIME_OUT, true, htmlPage);
 	}
 	
 	public WebReader customQuery(String subPage, int millis, boolean stack, WebConsumer<HtmlPage> htmlPage) {
 		new Thread(() -> {
 			try {
-				customSyncQuery(subPage, millis, htmlPage);
+				this.customSyncQuery(subPage, millis, htmlPage);
 			} catch(IOException e) {
 				if(stack) e.printStackTrace();
 			}
@@ -170,18 +188,44 @@ public class WebReader {
 	}
 	
 	public WebReader customQuery(boolean stack, WebConsumer<HtmlPage> htmlPage) {
-		return customQuery("", DEFAULT_TIME_OUT, stack, htmlPage);
+		return this.customQuery("", DEFAULT_TIME_OUT, stack, htmlPage);
 	}
 	
 	public WebReader customQuery(String subPage, boolean stack, WebConsumer<HtmlPage> htmlPage) {
-		return customQuery(subPage, DEFAULT_TIME_OUT, stack, htmlPage);
+		return this.customQuery(subPage, DEFAULT_TIME_OUT, stack, htmlPage);
 	}
 	
 	public WebReader customQuery(int millis, boolean stack, WebConsumer<HtmlPage> htmlPage) {
-		return customQuery("", millis, stack, htmlPage);
+		return this.customQuery("", millis, stack, htmlPage);
 	}
 	
 	public WebReader customQuery(String subPage, int millis, WebConsumer<HtmlPage> htmlPage) {
-		return customQuery(subPage, millis, true, htmlPage);
+		return this.customQuery(subPage, millis, true, htmlPage);
+	}
+	
+	@Override
+	public int hashCode() {
+		return Objects.hash(this.getUrl(), this.getCachedHTML());
+	}
+	
+	@Override
+	public boolean equals(Object o) {
+		if(this == o) return true;
+		if(o == null || getClass() != o.getClass()) return false;
+		WebReader reader = (WebReader) o;
+		return Objects.equals(this.getUrl(), reader.getUrl()) &&
+				Objects.equals(this.getCachedHTML(), reader.getCachedHTML());
+	}
+	
+	public String getUrl() {
+		return this.url;
+	}
+	
+	@Override
+	public String toString() {
+		return "WebReader{" +
+				"                            url='" + this.url + '\'' +
+				",                             cachedHTML='" + this.cachedHTML + '\'' +
+				'}';
 	}
 }

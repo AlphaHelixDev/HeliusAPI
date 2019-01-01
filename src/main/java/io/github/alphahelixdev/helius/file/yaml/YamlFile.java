@@ -10,6 +10,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Map;
+import java.util.Objects;
 
 public class YamlFile extends FileConfig {
 	
@@ -18,22 +19,19 @@ public class YamlFile extends FileConfig {
 	private final DumperOptions options = new DumperOptions();
 	private final Representer representer = new Representer();
 	
-	private final Yaml yaml = new Yaml(new Constructor(), representer, options);
+	private final Yaml yaml;
 	
 	public YamlFile() {
-		options.setIndent(YAML_INDENT_SIZE);
+		this.getOptions().setIndent(YamlFile.getYamlIndentSize());
+		this.getOptions().setDefaultFlowStyle(YamlFile.getYamlFlowStyle());
 		
-		options.setDefaultFlowStyle(YAML_FLOW_STYLE);
-		representer.setDefaultFlowStyle(YAML_FLOW_STYLE);
+		this.getRepresenter().setDefaultFlowStyle(YamlFile.getYamlFlowStyle());
+		
+		yaml = new Yaml(new Constructor(), this.getRepresenter(), this.getOptions());
 	}
 	
-	public static YamlFile loadFromFile(String filePath) {
-		final File file = new File(filePath);
-		
-		if(!file.isFile())
-			return new YamlFile();
-		
-		return loadFromFile(file);
+	public DumperOptions getOptions() {
+		return this.options;
 	}
 	
 	public static YamlFile loadFromFile(File file) {
@@ -66,8 +64,29 @@ public class YamlFile extends FileConfig {
 		return config;
 	}
 	
+	public static int getYamlIndentSize() {
+		return YamlFile.YAML_INDENT_SIZE;
+	}
+	
+	public static DumperOptions.FlowStyle getYamlFlowStyle() {
+		return YamlFile.YAML_FLOW_STYLE;
+	}
+	
+	public Representer getRepresenter() {
+		return this.representer;
+	}
+	
+	public static YamlFile loadFromFile(String filePath) {
+		final File file = new File(filePath);
+		
+		if(!file.isFile())
+			return new YamlFile();
+		
+		return YamlFile.loadFromFile(file);
+	}
+	
 	public String saveToString() {
-		return yaml.dump(getValues());
+		return this.getYaml().dump(getValues());
 	}
 	
 	public void loadFromString(String config) {
@@ -76,13 +95,17 @@ public class YamlFile extends FileConfig {
 		
 		Map<?, ?> input = null;
 		try {
-			input = yaml.load(config);
+			input = this.getYaml().load(config);
 		} catch(YAMLException | ClassCastException e) {
 			e.printStackTrace();
 		}
 		
 		if(input != null)
-			convertMapsToSections(input, this);
+			this.convertMapsToSections(input, this);
+	}
+	
+	public Yaml getYaml() {
+		return this.yaml;
 	}
 	
 	private void convertMapsToSections(Map<?, ?> input, ConfigSection section) {
@@ -91,9 +114,34 @@ public class YamlFile extends FileConfig {
 			final Object value = entry.getValue();
 			
 			if(value instanceof Map)
-				convertMapsToSections((Map<?, ?>) value, section.createSection(key));
+				this.convertMapsToSections((Map<?, ?>) value, section.createSection(key));
 			else
 				section.set(key, value);
 		}
+	}
+	
+	@Override
+	public int hashCode() {
+		return Objects.hash(super.hashCode(), this.getOptions(), this.getRepresenter(), this.getYaml());
+	}
+	
+	@Override
+	public boolean equals(Object o) {
+		if(this == o) return true;
+		if(o == null || getClass() != o.getClass()) return false;
+		if(!super.equals(o)) return false;
+		YamlFile yamlFile = (YamlFile) o;
+		return Objects.equals(this.getOptions(), yamlFile.getOptions()) &&
+				Objects.equals(this.getRepresenter(), yamlFile.getRepresenter()) &&
+				Objects.equals(this.getYaml(), yamlFile.getYaml());
+	}
+	
+	@Override
+	public String toString() {
+		return "YamlFile{" +
+				"                            options=" + this.options +
+				",                             representer=" + this.representer +
+				",                             yaml=" + this.yaml +
+				'}';
 	}
 }

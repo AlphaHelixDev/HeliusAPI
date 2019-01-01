@@ -14,6 +14,7 @@ import io.netty.handler.codec.string.StringEncoder;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 public class EchoServer {
 	
@@ -27,17 +28,21 @@ public class EchoServer {
 	}
 	
 	public static void addRequestProcessor(String data, RequestProcessor requestProcessor) {
-		REPROCESSOR_MAP.put(data, requestProcessor);
+		EchoServer.getReprocessorMap().put(data, requestProcessor);
+	}
+	
+	public static Map<String, RequestProcessor> getReprocessorMap() {
+		return EchoServer.REPROCESSOR_MAP;
 	}
 	
 	public static RequestProcessor process(String data) {
-		return REPROCESSOR_MAP.get(data);
+		return EchoServer.getReprocessorMap().get(data);
 	}
 	
 	public void start() {
 		ServerBootstrap b = new ServerBootstrap();
 		
-		b.group(workerGroup)
+		b.group(this.getWorkerGroup())
 				.channel(NioServerSocketChannel.class)
 				.option(ChannelOption.SO_KEEPALIVE, true)
 				.childHandler(new ChannelInitializer<SocketChannel>() {
@@ -49,15 +54,56 @@ public class EchoServer {
 					}
 				});
 		
-		f = b.bind(port);
+		this.setF(b.bind(port));
+	}
+	
+	public EventLoopGroup getWorkerGroup() {
+		return this.workerGroup;
 	}
 	
 	public void stop() {
 		try {
-			f.channel().close().sync();
-			workerGroup.shutdownGracefully();
+			this.getF().channel().close().sync();
+			this.getWorkerGroup().shutdownGracefully();
 		} catch(InterruptedException e) {
 			e.printStackTrace();
 		}
+	}
+	
+	public ChannelFuture getF() {
+		return this.f;
+	}
+	
+	public EchoServer setF(ChannelFuture f) {
+		this.f = f;
+		return this;
+	}
+	
+	@Override
+	public int hashCode() {
+		return Objects.hash(this.getPort(), this.getWorkerGroup(), this.getF());
+	}
+	
+	@Override
+	public boolean equals(Object o) {
+		if(this == o) return true;
+		if(o == null || getClass() != o.getClass()) return false;
+		EchoServer that = (EchoServer) o;
+		return this.getPort() == that.getPort() &&
+				Objects.equals(this.getWorkerGroup(), that.getWorkerGroup()) &&
+				Objects.equals(this.getF(), that.getF());
+	}
+	
+	public int getPort() {
+		return this.port;
+	}
+	
+	@Override
+	public String toString() {
+		return "EchoServer{" +
+				"                            port=" + this.port +
+				",                             workerGroup=" + this.workerGroup +
+				",                             f=" + this.f +
+				'}';
 	}
 }

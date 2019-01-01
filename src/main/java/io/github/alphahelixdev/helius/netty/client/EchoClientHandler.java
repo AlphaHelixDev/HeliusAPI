@@ -7,6 +7,8 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.util.CharsetUtil;
 
+import java.util.Objects;
+
 public class EchoClientHandler extends ChannelInboundHandlerAdapter {
 	
 	private ChannelHandlerContext ctx;
@@ -20,7 +22,7 @@ public class EchoClientHandler extends ChannelInboundHandlerAdapter {
 	@Override
 	public void channelActive(ChannelHandlerContext ctx) throws Exception {
 		super.channelActive(ctx);
-		this.ctx = ctx;
+		this.setCtx(ctx);
 	}
 	
 	@Override
@@ -34,11 +36,9 @@ public class EchoClientHandler extends ChannelInboundHandlerAdapter {
 	}
 	
 	public void requestData(String data) {
-		if(ctx != null) {
+		if(this.getCtx() != null) {
 			try {
-				ChannelFuture f = ctx.writeAndFlush(Unpooled.copiedBuffer(data, CharsetUtil.UTF_8)).sync();
-				
-				System.out.println(f);
+				ChannelFuture f = this.getCtx().writeAndFlush(Unpooled.copiedBuffer(data, CharsetUtil.UTF_8)).sync();
 				
 				if(!f.isSuccess())
 					try {
@@ -50,5 +50,34 @@ public class EchoClientHandler extends ChannelInboundHandlerAdapter {
 				e.printStackTrace();
 			}
 		}
+	}
+	
+	public ChannelHandlerContext getCtx() {
+		return this.ctx;
+	}
+	
+	public EchoClientHandler setCtx(ChannelHandlerContext ctx) {
+		this.ctx = ctx;
+		return this;
+	}
+	
+	@Override
+	public int hashCode() {
+		return Objects.hash(this.getCtx());
+	}
+	
+	@Override
+	public boolean equals(Object o) {
+		if(this == o) return true;
+		if(o == null || getClass() != o.getClass()) return false;
+		EchoClientHandler that = (EchoClientHandler) o;
+		return Objects.equals(this.getCtx(), that.getCtx());
+	}
+	
+	@Override
+	public String toString() {
+		return "EchoClientHandler{" +
+				"                            ctx=" + this.ctx +
+				'}';
 	}
 }

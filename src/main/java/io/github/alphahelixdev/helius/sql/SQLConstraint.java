@@ -13,17 +13,17 @@ public class SQLConstraint {
 	private String value;
 	
 	public SQLConstraint(String constraint, String value) {
-		this.constraint = constraint;
-		this.value = value;
+		this.setConstraint(constraint);
+		this.setValue(value);
 	}
 	
 	@Override
 	public String toString() {
-		return getConstraint().replace("$arg", getValue());
+		return this.getConstraint().replace("$arg", this.getValue());
 	}
 	
 	public String getConstraint() {
-		return constraint;
+		return this.constraint;
 	}
 	
 	public SQLConstraint setConstraint(String constraint) {
@@ -32,7 +32,7 @@ public class SQLConstraint {
 	}
 	
 	public String getValue() {
-		return value;
+		return this.value;
 	}
 	
 	public SQLConstraint setValue(String value) {

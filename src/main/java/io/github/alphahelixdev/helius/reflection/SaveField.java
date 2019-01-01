@@ -2,6 +2,7 @@ package io.github.alphahelixdev.helius.reflection;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
+import java.util.Objects;
 
 public class SaveField {
 	
@@ -31,61 +32,75 @@ public class SaveField {
 		return this;
 	}
 	
-	public Field asNormal() {
-		return field;
-	}
-	
 	public Object get(Object instance) {
-		return get(instance, true);
+		return this.get(instance, true);
 	}
 	
 	public Object get(Object instance, boolean stackTrace) {
 		try {
-			return field.get(instance);
+			return this.asNormal().get(instance);
 		} catch(Exception e) {
 			if(stackTrace) e.printStackTrace();
 		}
 		return new Object();
 	}
 	
+	public Field asNormal() {
+		return field;
+	}
+	
 	public Object getStatic() {
-		return getStatic(true);
+		return this.getStatic(true);
 	}
 	
 	public Object getStatic(boolean stackTrace) {
-		return get(null, stackTrace);
+		return this.get(null, stackTrace);
 	}
 	
 	public SaveField setStatic(Object value) {
-		return set(null, value, true);
+		return this.set(null, value, true);
+	}
+	
+	public SaveField set(Object instance, Object value) {
+		return this.set(instance, value, true);
 	}
 	
 	public SaveField set(Object instance, Object value, boolean stackTrace) {
 		try {
-			field.set(instance, value);
+			this.asNormal().set(instance, value);
 		} catch(Exception e) {
 			if(stackTrace) e.printStackTrace();
 		}
 		return this;
 	}
 	
-	public SaveField set(Object instance, Object value) {
-		return set(instance, value, true);
+	public SaveField setStatic(Object value, boolean stackTrace) {
+		return this.set(null, value, stackTrace);
 	}
 	
-	public SaveField setStatic(Object value, boolean stackTrace) {
-		return set(null, value, stackTrace);
+	@Override
+	public int hashCode() {
+		return Objects.hash(this.field, this.getClassIndex());
+	}
+	
+	@Override
+	public boolean equals(Object o) {
+		if(this == o) return true;
+		if(o == null || getClass() != o.getClass()) return false;
+		SaveField saveField = (SaveField) o;
+		return this.getClassIndex() == saveField.getClassIndex() &&
+				Objects.equals(this.field, saveField.field);
 	}
 	
 	public int getClassIndex() {
-		return classIndex;
+		return this.classIndex;
 	}
 	
 	@Override
 	public String toString() {
 		return "SaveField{" +
-				"field=" + field +
-				", classIndex=" + classIndex +
+				"                            field=" + this.field +
+				",                             classIndex=" + this.classIndex +
 				'}';
 	}
 }

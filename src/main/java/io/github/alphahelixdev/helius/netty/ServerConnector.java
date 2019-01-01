@@ -19,44 +19,44 @@ public class ServerConnector {
 			return;
 		}
 		
-		server = new EchoServer(ownPort);
+		this.setOwnServer(new EchoServer(ownPort));
 		if(!host.isEmpty())
-			client = new EchoClient(host, port);
+			this.setClient(new EchoClient(host, port));
 		
 		ScheduledThreadPoolExecutor executor = new ScheduledThreadPoolExecutor(1);
 		
 		executor.execute(() -> {
 			try {
-				server.start();
+				this.getOwnServer().start();
 			} catch(Exception e) {
 				e.printStackTrace();
 			}
 		});
 	}
 	
-	public ServerConnector setServer(EchoServer server) {
+	public EchoServer getOwnServer() {
+		return this.server;
+	}
+	
+	public ServerConnector setOwnServer(EchoServer server) {
 		this.server = server;
 		return this;
 	}
 	
-	public EchoServer getOwnServer() {
-		return server;
-	}
-	
 	public void makeRequest(String request, Consumer<JsonElement> callback) {
-		getClient().request(request, callback);
+		this.getClient().request(request, callback);
 	}
 	
 	public EchoClient getClient() {
-		return client;
+		return this.client;
+	}
+	
+	public void addRequestProcessor(String request, RequestProcessor reprocessor) {
+		EchoServer.addRequestProcessor(request, reprocessor);
 	}
 	
 	public ServerConnector setClient(EchoClient client) {
 		this.client = client;
 		return this;
-	}
-	
-	public void addRequestProcessor(String request, RequestProcessor reprocessor) {
-		EchoServer.addRequestProcessor(request, reprocessor);
 	}
 }

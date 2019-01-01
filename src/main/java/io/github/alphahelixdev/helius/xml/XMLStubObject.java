@@ -10,26 +10,27 @@ public class XMLStubObject<T> extends XMLObject {
 	
 	public XMLStubObject(String name, T value) {
 		super(name);
-		this.value = value;
+		this.setValue(value);
 	}
 	
 	public XMLStubObject(String name, XMLObject[] childs, T value) {
 		super(name, childs);
-		this.value = value;
+		this.setValue(value);
 	}
 	
 	public XMLStubObject(XMLObject parent, String name, T value) {
 		super(parent, name);
-		this.value = value;
+		this.setValue(value);
 	}
 	
 	public XMLStubObject(XMLObject parent, String name, XMLObject[] childs, T value) {
 		super(parent, name, childs);
-		this.value = value;
+		this.setValue(value);
 	}
 	
-	public T getValue() {
-		return value;
+	@Override
+	public String childXML() {
+		return String.valueOf(this.getValue());
 	}
 	
 	public XMLStubObject<T> setValue(T value) {
@@ -47,8 +48,7 @@ public class XMLStubObject<T> extends XMLObject {
 		return this;
 	}
 	
-	@Override
-	public String childXML() {
-		return String.valueOf(value);
+	public T getValue() {
+		return this.value;
 	}
 }

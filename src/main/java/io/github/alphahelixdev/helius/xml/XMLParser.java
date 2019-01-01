@@ -25,18 +25,18 @@ public class XMLParser {
 			
 			if(name.startsWith("/")) continue;
 			
-			String tagValue = tagValue(tagsBetween(name, tags));
+			String tagValue = this.tagValue(tagsBetween(name, tags));
 			
 			if(tag.matches("<.*/>")) { //is property
 				XMLPropertyObject prop = new XMLPropertyObject(head, name);
 				
-				prop = insertAtrr(prop, tag.replaceAll("/>(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)", ">"));
+				prop = this.insertAtrr(prop, tag.replaceAll("/>(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)", ">"));
 				
 				head.addChild(prop);
 			} else if(tagValue.startsWith("<") && tagValue.endsWith(">")) {
-				XMLObject child = getChild(head, name, tagValue);
+				XMLObject child = this.getChild(head, name, tagValue);
 				
-				child = insertAtrr(child, tag);
+				child = this.insertAtrr(child, tag);
 				
 				if(!head.getName().equals(name)) {
 					head.addChild(child);
@@ -46,7 +46,7 @@ public class XMLParser {
 			} else { //is stub
 				XMLStubObject<String> stub = new XMLStubObject<>(head, name, tagValue);
 				
-				stub = insertAtrr(stub, tag);
+				stub = this.insertAtrr(stub, tag);
 				
 				head.addChild(stub);
 			}
@@ -66,18 +66,18 @@ public class XMLParser {
 			
 			if(name.startsWith("/")) continue;
 			
-			String tagValue = tagValue(tagsBetween(name, tags));
+			String tagValue = this.tagValue(tagsBetween(name, tags));
 			
 			if(tag.matches("<.*/>")) { //is property
 				XMLPropertyObject prop = new XMLPropertyObject(head, name);
 				
-				prop = insertAtrr(prop, tag.replaceAll("/>(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)", ">"));
+				prop = this.insertAtrr(prop, tag.replaceAll("/>(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)", ">"));
 				
 				head.addChild(prop);
 			} else if(tagValue.startsWith("<") && tagValue.endsWith(">")) {
-				XMLObject child = getChild(head, name, tagValue);
+				XMLObject child = this.getChild(head, name, tagValue);
 				
-				child = insertAtrr(child, tag);
+				child = this.insertAtrr(child, tag);
 				
 				if(!pName.equals(name)) {
 					head.addChild(child);
@@ -87,7 +87,7 @@ public class XMLParser {
 			} else { //is stub
 				XMLStubObject<String> stub = new XMLStubObject<>(head, name, tagValue);
 				
-				stub = insertAtrr(stub, tag);
+				stub = this.insertAtrr(stub, tag);
 				
 				head.addChild(stub);
 			}
@@ -98,7 +98,7 @@ public class XMLParser {
 	
 	private <T extends XMLObject> T insertAtrr(T xObj, String tag) {
 		if(tag.matches("<.* .*>.*")) {
-			String[] tagAtrr = tagAtrrs(tag);
+			String[] tagAtrr = this.tagAtrrs(tag);
 			
 			for(int aI = 1; aI < tagAtrr.length; aI++) {
 				String[] atrr = tagAtrr[aI].split("=(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)", 2);
@@ -189,7 +189,7 @@ public class XMLParser {
 				continue;
 			}
 			
-			XMLObject child = toXMLObject(head, field.asNormal().getName(), field.get(obj));
+			XMLObject child = this.toXMLObject(head, field.asNormal().getName(), field.get(obj));
 			
 			if(field.asNormal().isAnnotationPresent(XMLAttribute.class)) {
 				XMLAttribute attr = field.asNormal().getDeclaredAnnotation(XMLAttribute.class);
@@ -234,7 +234,7 @@ public class XMLParser {
 			if((f.getType().isPrimitive() || f.getType().equals(String.class)) && cObj instanceof XMLStubObject)
 				f.set(type, ((XMLStubObject) cObj).getValue());
 			else
-				f.set(type, fromXMLObject(cObj));
+				f.set(type, this.fromXMLObject(cObj));
 		}
 		
 		return type;

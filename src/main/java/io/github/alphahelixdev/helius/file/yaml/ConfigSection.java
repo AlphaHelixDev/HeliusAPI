@@ -1,9 +1,6 @@
 package io.github.alphahelixdev.helius.file.yaml;
 
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class ConfigSection {
 	
@@ -18,54 +15,46 @@ public class ConfigSection {
 	public ConfigSection(ConfigSection parent, String key, Object value) {
 		this.parent = parent;
 		this.key = key;
-		this.value = value;
-	}
-	
-	public ConfigSection getParent() {
-		return parent;
+		this.setValue(value);
 	}
 	
 	public boolean isRoot() {
-		return this.parent == null;
+		return this.getParent() == null;
 	}
 	
 	public ConfigSection getRoot() {
-		if(isRoot())
+		if(this.isRoot())
 			return this;
-		return this.parent.getRoot();
+		return this.getParent().getRoot();
 	}
 	
 	public String getPath() {
-		if(isRoot())
+		if(this.isRoot())
 			return "";
 		
-		if(this.parent.isRoot())
-			return this.key;
+		if(this.getParent().isRoot())
+			return this.getKey();
 		
 		StringBuilder path = new StringBuilder();
 		
 		if(!isRoot())
-			path.append(this.parent.getPath()).append(".");
+			path.append(this.getParent().getPath()).append(".");
 		
-		path.append(this.key);
+		path.append(this.getKey());
 		
 		return path.toString();
 	}
 	
-	public String getKey() {
-		return key;
-	}
-	
 	public boolean contains(String path) {
-		return get(path) != null;
+		return this.get(path) != null;
 	}
 	
 	public Object get() {
-		return get("");
+		return this.get("");
 	}
 	
 	public Object get(String path) {
-		return get(path, null);
+		return this.get(path, null);
 	}
 	
 	public Object get(String path, Object def) {
@@ -75,7 +64,7 @@ public class ConfigSection {
 		path = path.trim();
 		
 		if(path.equals(""))
-			return this.value;
+			return this.getValue();
 		
 		final ConfigSection section = getConfigSection(path);
 		
@@ -86,11 +75,11 @@ public class ConfigSection {
 	}
 	
 	public String getString(String path) {
-		return getString(path, "");
+		return this.getString(path, "");
 	}
 	
 	public String getString(String path, String def) {
-		final Object value = get(path);
+		final Object value = this.get(path);
 		
 		if(value == null)
 			return def;
@@ -101,25 +90,25 @@ public class ConfigSection {
 	}
 	
 	public boolean isString() {
-		return isString("");
+		return this.isString("");
 	}
 	
 	public boolean isString(String path) {
-		final Object value = get(path);
+		final Object value = this.get(path);
 		
 		return (value instanceof String);
 	}
 	
 	public int getInt() {
-		return getInt("");
+		return this.getInt("");
 	}
 	
 	public int getInt(String path) {
-		return getInt(path, 0);
+		return this.getInt(path, 0);
 	}
 	
 	public int getInt(String path, int def) {
-		final Object value = get(path);
+		final Object value = this.get(path);
 		
 		if(value == null)
 			return def;
@@ -130,25 +119,25 @@ public class ConfigSection {
 	}
 	
 	public boolean isInt() {
-		return isInt("");
+		return this.isInt("");
 	}
 	
 	public boolean isInt(String path) {
-		final Object value = get(path);
+		final Object value = this.get(path);
 		
 		return (value instanceof Integer);
 	}
 	
 	public boolean getBoolean() {
-		return getBoolean("");
+		return this.getBoolean("");
 	}
 	
 	public boolean getBoolean(String path) {
-		return getBoolean(path, false);
+		return this.getBoolean(path, false);
 	}
 	
 	public boolean getBoolean(String path, boolean def) {
-		final Object value = get(path);
+		final Object value = this.get(path);
 		
 		if(value == null)
 			return def;
@@ -159,25 +148,25 @@ public class ConfigSection {
 	}
 	
 	public boolean isBoolean() {
-		return isBoolean("");
+		return this.isBoolean("");
 	}
 	
 	public boolean isBoolean(String path) {
-		final Object value = get(path);
+		final Object value = this.get(path);
 		
 		return (value instanceof Boolean);
 	}
 	
 	public double getDouble() {
-		return getDouble("");
+		return this.getDouble("");
 	}
 	
 	public double getDouble(String path) {
-		return getDouble(path, 0);
+		return this.getDouble(path, 0);
 	}
 	
 	public double getDouble(String path, double def) {
-		final Object value = get(path);
+		final Object value = this.get(path);
 		
 		if(value == null)
 			return def;
@@ -188,25 +177,25 @@ public class ConfigSection {
 	}
 	
 	public boolean isDouble() {
-		return isDouble("");
+		return this.isDouble("");
 	}
 	
 	public boolean isDouble(String path) {
-		final Object value = get(path);
+		final Object value = this.get(path);
 		
 		return (value instanceof Double);
 	}
 	
 	public float getFloat() {
-		return getFloat("");
+		return this.getFloat("");
 	}
 	
 	public float getFloat(String path) {
-		return getFloat(path, 0);
+		return this.getFloat(path, 0);
 	}
 	
 	public float getFloat(String path, float def) {
-		final Object value = get(path);
+		final Object value = this.get(path);
 		
 		if(value == null)
 			return def;
@@ -217,25 +206,25 @@ public class ConfigSection {
 	}
 	
 	public boolean isFloat() {
-		return isFloat("");
+		return this.isFloat("");
 	}
 	
 	public boolean isFloat(String path) {
-		final Object value = get(path);
+		final Object value = this.get(path);
 		
 		return (value instanceof Float);
 	}
 	
 	public long getLong() {
-		return getLong("");
+		return this.getLong("");
 	}
 	
 	public long getLong(String path) {
-		return getLong(path, 0);
+		return this.getLong(path, 0);
 	}
 	
 	public long getLong(String path, long def) {
-		final Object value = get(path);
+		final Object value = this.get(path);
 		
 		if(value == null)
 			return def;
@@ -246,25 +235,25 @@ public class ConfigSection {
 	}
 	
 	public boolean isLong() {
-		return isLong("");
+		return this.isLong("");
 	}
 	
 	public boolean isLong(String path) {
-		final Object value = get(path);
+		final Object value = this.get(path);
 		
 		return (value instanceof Long);
 	}
 	
 	public List<?> getList() {
-		return getList("");
+		return this.getList("");
 	}
 	
 	public List<?> getList(String path) {
-		return getList(path, null);
+		return this.getList(path, null);
 	}
 	
 	public List<?> getList(String path, List<?> def) {
-		final Object value = get(path);
+		final Object value = this.get(path);
 		
 		if(value == null)
 			return def;
@@ -275,18 +264,18 @@ public class ConfigSection {
 	}
 	
 	public boolean isList() {
-		return isList("");
+		return this.isList("");
 	}
 	
 	public boolean isList(String path) {
-		final Object value = get(path);
+		final Object value = this.get(path);
 		
 		return (value instanceof List);
 		
 	}
 	
 	public List<String> getKeys() {
-		return getKeys("");
+		return this.getKeys("");
 	}
 	
 	public List<String> getKeys(String path) {
@@ -295,7 +284,7 @@ public class ConfigSection {
 		
 		path = path.trim();
 		
-		if(!isConfigSection(path))
+		if(!this.isConfigSection(path))
 			return new ArrayList<>();
 		
 		final ConfigSection section = getConfigSection(path);
@@ -313,7 +302,7 @@ public class ConfigSection {
 	}
 	
 	public ConfigSection getSection(String path) {
-		return getConfigSection(path);
+		return this.getConfigSection(path);
 	}
 	
 	public ConfigSection getConfigSection(String path) {
@@ -325,17 +314,17 @@ public class ConfigSection {
 		if(path.equals(""))
 			return this;
 		
-		if(!isSet(""))
+		if(!this.isSet(""))
 			return null;
 		
 		if(!path.contains(".")) {
-			if(!isConfigSection(path))
+			if(!this.isConfigSection(path))
 				return null;
 			
-			if(this.value instanceof List) {
+			if(this.getValue() instanceof List) {
 				try {
 					@SuppressWarnings("unchecked")
-					List<ConfigSection> sections = (List<ConfigSection>) this.value;
+					List<ConfigSection> sections = (List<ConfigSection>) this.getValue();
 					for(ConfigSection section : sections) {
 						if(section == null)
 							continue;
@@ -375,7 +364,7 @@ public class ConfigSection {
 	}
 	
 	public ConfigSection createSection(String path) {
-		return createConfigSection(path);
+		return this.createConfigSection(path);
 	}
 	
 	public ConfigSection createConfigSection(String path) {
@@ -399,7 +388,7 @@ public class ConfigSection {
 			subPath = new StringBuilder(subPath.toString().trim());
 		}
 		
-		if(isConfigSection(key)) {
+		if(this.isConfigSection(key)) {
 			final ConfigSection section = getConfigSection(key);
 			
 			if(subPath.length() == 0)
@@ -407,12 +396,12 @@ public class ConfigSection {
 			
 			return section.createConfigSection(subPath.toString());
 		} else {
-			if(this.value instanceof List) {
+			if(this.getValue() instanceof List) {
 				try {
-					List<ConfigSection> sections = (List<ConfigSection>) this.value;
+					List<ConfigSection> sections = (List<ConfigSection>) this.getValue();
 					ConfigSection section = new ConfigSection(this, key, null);
 					sections.add(section);
-					this.value = sections;
+					this.setValue(sections);
 					
 					if(subPath.length() == 0)
 						return section;
@@ -425,7 +414,7 @@ public class ConfigSection {
 			final ConfigSection section = new ConfigSection(this, key, null);
 			List<ConfigSection> sections = new ArrayList<>();
 			sections.add(section);
-			this.value = sections;
+			this.setValue(sections);
 			
 			if(subPath.length() == 0)
 				return section;
@@ -435,7 +424,7 @@ public class ConfigSection {
 	}
 	
 	public void set(Object value) {
-		set("", value);
+		this.set("", value);
 	}
 	
 	public void set(String path, Object value) {
@@ -445,7 +434,7 @@ public class ConfigSection {
 		path = path.trim();
 		
 		if(path.equals("")) {
-			this.value = value;
+			this.setValue(value);
 			return;
 		}
 		
@@ -460,26 +449,26 @@ public class ConfigSection {
 				subPath.append(".").append(keys[i]);
 		}
 		
-		if(isConfigSection(key)) {
+		if(this.isConfigSection(key)) {
 			final ConfigSection section = getConfigSection(key);
 			section.set(subPath.toString(), value);
 			
 		} else {
 			final ConfigSection section = new ConfigSection(this, key, null);
-			if(this.value instanceof List) {
+			if(this.getValue() instanceof List) {
 				try {
-					List<ConfigSection> sections = (List<ConfigSection>) this.value;
+					List<ConfigSection> sections = (List<ConfigSection>) this.getValue();
 					sections.add(section);
 					
 				} catch(ClassCastException ex) {
 					List<ConfigSection> sections = new ArrayList<>();
 					sections.add(section);
-					this.value = sections;
+					this.setValue(sections);
 				}
 			} else {
 				List<ConfigSection> sections = new ArrayList<>();
 				sections.add(section);
-				this.value = sections;
+				this.setValue(sections);
 			}
 			
 			section.set(subPath.toString(), value);
@@ -490,34 +479,33 @@ public class ConfigSection {
 		if(path == null)
 			return false;
 		
-		final ConfigSection section = getConfigSection(path);
+		final ConfigSection section = this.getConfigSection(path);
 		
 		return section != null && section.get("") != null;
 	}
 	
 	public boolean isHoldingConfigSections() {
-		if(this.value == null)
+		if(this.getValue() == null)
 			return false;
 		
 		try {
-			final List<ConfigSection> sections = (List<ConfigSection>) this.value;
+			final List<ConfigSection> sections = (List<ConfigSection>) this.getValue();
 			return sections.size() > 0 && (sections.get(0) != null);
-			
 		} catch(ClassCastException e) {
 			return false;
 		}
 	}
 	
 	public boolean isSection() {
-		return isSection("");
+		return this.isSection("");
 	}
 	
 	public boolean isSection(String path) {
-		return isConfigSection(path);
+		return this.isConfigSection(path);
 	}
 	
 	public boolean isConfigSection() {
-		return isConfigSection("");
+		return this.isConfigSection("");
 	}
 	
 	public boolean isConfigSection(String path) {
@@ -529,11 +517,11 @@ public class ConfigSection {
 		if(path.equals(""))
 			return true;
 		
-		if(!(this.value instanceof List))
+		if(!(this.getValue() instanceof List))
 			return false;
 		
 		try {
-			final List<ConfigSection> sections = (List<ConfigSection>) this.value;
+			final List<ConfigSection> sections = (List<ConfigSection>) this.getValue();
 			for(ConfigSection section : sections) {
 				if(section == null)
 					continue;
@@ -565,12 +553,12 @@ public class ConfigSection {
 	public Map<String, Object> getValues() {
 		final Map<String, Object> out = new LinkedHashMap<>();
 		
-		if(this.key == null)
+		if(this.getKey() == null)
 			return out;
 		
-		if(this.value instanceof List) {
+		if(this.getValue() instanceof List) {
 			try {
-				List<ConfigSection> sections = (List<ConfigSection>) this.value;
+				List<ConfigSection> sections = (List<ConfigSection>) this.getValue();
 				for(ConfigSection entry : sections)
 					if(entry.isHoldingConfigSections())
 						out.put(entry.getKey(), entry.getValues());
@@ -578,11 +566,52 @@ public class ConfigSection {
 						out.put(entry.getKey(), entry.get(""));
 				
 			} catch(ClassCastException e) {
-				out.put(getKey(), this.value);
+				out.put(this.getKey(), this.getValue());
 			}
 		} else
-			out.put(getKey(), this.value);
+			out.put(this.getKey(), this.getValue());
 		
 		return out;
+	}
+	
+	@Override
+	public int hashCode() {
+		return Objects.hash(this.getParent(), this.getKey(), this.getValue());
+	}
+	
+	@Override
+	public boolean equals(Object o) {
+		if(this == o) return true;
+		if(o == null || getClass() != o.getClass()) return false;
+		ConfigSection that = (ConfigSection) o;
+		return Objects.equals(this.getParent(), that.getParent()) &&
+				Objects.equals(this.getKey(), that.getKey()) &&
+				Objects.equals(this.getValue(), that.getValue());
+	}
+	
+	public ConfigSection getParent() {
+		return this.parent;
+	}
+	
+	public String getKey() {
+		return this.key;
+	}
+	
+	public Object getValue() {
+		return this.value;
+	}
+	
+	private ConfigSection setValue(Object value) {
+		this.value = value;
+		return this;
+	}
+	
+	@Override
+	public String toString() {
+		return "ConfigSection{" +
+				"                            parent=" + this.parent +
+				",                             key='" + this.key + '\'' +
+				",                             value=" + this.value +
+				'}';
 	}
 }

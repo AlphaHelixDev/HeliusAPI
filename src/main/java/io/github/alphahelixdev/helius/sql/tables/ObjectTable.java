@@ -13,7 +13,7 @@ import io.github.alphahelixdev.helius.sql.SQLTableHandler;
 import java.lang.annotation.Annotation;
 import java.util.ArrayList;
 import java.util.List;
-
+import java.util.Objects;
 
 public class ObjectTable {
 	
@@ -22,17 +22,17 @@ public class ObjectTable {
 	private final Gson gson = new GsonBuilder().create();
 	private SQLTableHandler tableHandler;
 	
-	public ObjectTable(SQLTableHandler tableHandler, Class<?> objClass) throws ReflectiveOperationException {
-		this.tableHandler = tableHandler;
+	public ObjectTable(SQLTableHandler tableHandler, Class<?> objClass) {
+		this.setTableHandler(tableHandler);
 		this.objClass = objClass;
 		
 		createTable();
 	}
 	
-	private void createTable() throws ReflectiveOperationException {
+	private void createTable() {
 		List<SQLColumn> columns = new ArrayList<>();
 		
-		for(SaveField field : Helius.getReflections().getDeclaredFields(this.objClass)) {
+		for(SaveField field : Helius.getReflections().getDeclaredFields(this.getObjClass())) {
 			SQLConstraint constraint = null;
 			SQLDataType dataType = null;
 			
@@ -40,62 +40,74 @@ public class ObjectTable {
 				String pack = a.annotationType().getName();
 				
 				if(pack.startsWith("io.github.alphahelixdev.helius.sql.annotations.constraints")) {
-					
-					SaveMethod valueMeth;
-					
-					try {
-						valueMeth = Helius.getReflections().getDeclaredMethod("value", a.annotationType());
-					} catch(NoSuchMethodException e) {
-						valueMeth = null;
-					}
+					SaveMethod valueMeth = Helius.getReflections().getDeclaredMethod("value", a.annotationType());
 					
 					if(valueMeth == null) {
 						constraint = new SQLConstraint(a.annotationType().getSimpleName(), "");
 					} else {
-						constraint = new SQLConstraint(a.annotationType().getSimpleName(), (String) valueMeth.invoke(a));
+						constraint = new SQLConstraint(a.annotationType().getSimpleName(), (String) valueMeth.invoke(a, true));
 					}
 				} else if(pack.startsWith("io.github.alphahelixdev.helius.sql.annotations.datatypes")) {
-					SaveField type = Helius.getReflections().getDeclaredField("DATA_TYPE", a.annotationType());
-					
-					dataType = (SQLDataType) type.get(null);
+					dataType = (SQLDataType) Helius.getReflections().getDeclaredField("DATA_TYPE", a.annotationType()).getStatic();
 				}
 			}
 			
 			if(dataType != null) {
 				columns.add(new SQLColumn(field.asNormal().getName(), dataType, constraint));
-				this.fields.add(field);
+				this.getFields().add(field);
 			}
 		}
 		
-		this.tableHandler.create(columns.toArray(new SQLColumn[columns.size()]));
+		this.getTableHandler().create(columns.toArray(new SQLColumn[columns.size()]));
+	}
+	
+	public Class<?> getObjClass() {
+		return this.objClass;
+	}
+	
+	public List<SaveField> getFields() {
+		return this.fields;
+	}
+	
+	public SQLTableHandler getTableHandler() {
+		return this.tableHandler;
+	}
+	
+	public ObjectTable setTableHandler(SQLTableHandler tableHandler) {
+		this.tableHandler = tableHandler;
+		return this;
 	}
 	
 	public ObjectTable addObject(Object obj) {
-		if(!obj.getClass().equals(this.objClass)) return this;
+		if(!obj.getClass().equals(this.getObjClass())) return this;
 		
-		String[] values = new String[this.fields.size()];
+		String[] values = new String[this.getFields().size()];
 		
 		for(int i = 0; i < values.length; i++) {
-			SaveField field = fields.get(i);
+			SaveField field = this.getFields().get(i);
 			
-			values[i] = gson.toJsonTree(field.get(obj), field.asNormal().getType()).toString();
+			values[i] = this.getGson().toJsonTree(field.get(obj), field.asNormal().getType()).toString();
 		}
 		
-		this.tableHandler.insert(values);
+		this.getTableHandler().insert(values);
 		
 		return this;
+	}
+	
+	public Gson getGson() {
+		return this.gson;
 	}
 	
 	public List<Object> getObjects() throws ReflectiveOperationException {
 		List<Object> objs = new ArrayList<>();
 		
-		for(int row = 0; row < this.tableHandler.getSyncRows().size(); row++) {
-			Object inst = this.objClass.newInstance();
+		for(int row = 0; row < this.getTableHandler().getSyncRows().size(); row++) {
+			Object inst = this.getObjClass().newInstance();
 			
-			for(int field = 0; field < this.fields.size(); field++) {
-				String jsonedObj = this.tableHandler.getSyncRows().get(row).get(field);
+			for(int field = 0; field < this.getFields().size(); field++) {
+				String jsonedObj = this.getTableHandler().getSyncRows().get(row).get(field);
 				
-				this.fields.get(field).set(inst, this.gson.fromJson(jsonedObj, Object.class), false);
+				this.getFields().get(field).set(inst, this.getGson().fromJson(jsonedObj, Object.class), false);
 			}
 			objs.add(inst);
 		}
@@ -103,7 +115,29 @@ public class ObjectTable {
 		return objs;
 	}
 	
-	public SQLTableHandler getTableHandler() {
-		return tableHandler;
+	@Override
+	public int hashCode() {
+		return Objects.hash(this.getObjClass(), this.getFields(), this.getGson(), this.getTableHandler());
+	}
+	
+	@Override
+	public boolean equals(Object o) {
+		if(this == o) return true;
+		if(o == null || getClass() != o.getClass()) return false;
+		ObjectTable that = (ObjectTable) o;
+		return Objects.equals(this.getObjClass(), that.getObjClass()) &&
+				Objects.equals(this.getFields(), that.getFields()) &&
+				Objects.equals(this.getGson(), that.getGson()) &&
+				Objects.equals(this.getTableHandler(), that.getTableHandler());
+	}
+	
+	@Override
+	public String toString() {
+		return "ObjectTable{" +
+				"                            objClass=" + this.objClass +
+				",                             fields=" + this.fields +
+				",                             gson=" + this.gson +
+				",                             tableHandler=" + this.tableHandler +
+				'}';
 	}
 }

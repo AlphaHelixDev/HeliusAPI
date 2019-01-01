@@ -3,14 +3,12 @@ package io.github.alphahelixdev.helius.file.xml;
 import io.github.alphahelixdev.helius.Helius;
 import io.github.alphahelixdev.helius.xml.XMLObject;
 import io.github.alphahelixdev.helius.xml.XMLParser;
-import org.apache.commons.io.FileUtils;
 
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.net.URI;
-import java.nio.charset.Charset;
 
 public class XmlFile extends File {
 	
@@ -36,8 +34,8 @@ public class XmlFile extends File {
 		Helius.createFile(this);
 	}
 	
-	public XmlFile write(String name, Object obj) throws ReflectiveOperationException {
-		return update(PARSER.toXMLObject(null, name, obj));
+	public XmlFile write(String name, Object obj) {
+		return update(XmlFile.getParser().toXMLObject(null, name, obj));
 	}
 	
 	public XmlFile update(XMLObject obj) {
@@ -49,13 +47,16 @@ public class XmlFile extends File {
 		return this;
 	}
 	
+	public static XMLParser getParser() {
+		return XmlFile.PARSER;
+	}
+	
 	public XMLObject read() {
-		try {
-			String file = FileUtils.readFileToString(this, Charset.defaultCharset());
-			return PARSER.get(file);
-		} catch(IOException e) {
-			e.printStackTrace();
-			throw new RuntimeException("Unable to read xml file '" + this.getName() + "'");
-		}
+		return XmlFile.getParser().get(Helius.read(this));
+	}
+	
+	@Override
+	public String toString() {
+		return "XmlFile{}";
 	}
 }

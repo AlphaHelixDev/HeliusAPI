@@ -6,6 +6,7 @@ import io.github.alphahelixdev.helius.xml.exceptions.NoSuchChildException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 
 public class XMLObject {
 	
@@ -50,79 +51,75 @@ public class XMLObject {
 		this(parent, name, new XMLAttribute<?>[]{}, childs);
 	}
 	
-	public XMLObject getParent() {
-		return parent;
-	}
-	
-	public List<XMLAttribute<?>> getAttributes() {
-		return this.attributes;
-	}
-	
 	public List<XMLAttribute<?>> getDeepAttributes() {
 		List<XMLAttribute<?>> attributes = getAttributes();
 		
-		for(XMLObject child : getChilds())
+		for(XMLObject child : this.getChilds())
 			attributes.addAll(child.getDeepAttributes());
 		
 		return attributes;
 	}
 	
 	public <V> XMLAttribute<V> findAttribute(String name, Class<V> valueClass) throws NoSuchAttributeException {
-		return findAttribute(name, valueClass, false);
+		return this.findAttribute(name, valueClass, false);
 	}
 	
 	public <V> XMLAttribute<V> findAttribute(String name, Class<V> valueClass, boolean deep) throws NoSuchAttributeException {
 		if(deep) {
-			for(XMLAttribute<?> attribute : getDeepAttributes()) {
+			for(XMLAttribute<?> attribute : this.getDeepAttributes()) {
 				if(attribute.name().equals(name) && attribute.value().getClass().equals(valueClass))
 					return (XMLAttribute<V>) attribute;
 			}
 			throw new NoSuchAttributeException(this, name);
 		}
 		
-		for(XMLAttribute<?> attribute : getAttributes()) {
+		for(XMLAttribute<?> attribute : this.getAttributes()) {
 			if(attribute.name().equals(name) && attribute.value().getClass().equals(valueClass))
 				return (XMLAttribute<V>) attribute;
 		}
 		throw new NoSuchAttributeException(this, name);
 	}
 	
-	public List<XMLObject> getChilds() {
-		return childs;
-	}
-	
 	public XMLObject findChild(String name) throws NoSuchChildException {
-		for(XMLObject child : this.childs) {
+		for(XMLObject child : this.getChilds()) {
 			if(child.getName().equals(name))
 				return child;
 		}
 		throw new NoSuchChildException(this, name);
 	}
 	
+	public List<XMLObject> getChilds() {
+		return this.childs;
+	}
+	
 	public String getName() {
-		return name;
+		return this.name;
 	}
 	
 	public XMLObject addChild(XMLObject child) {
-		this.childs.add(child);
+		this.getChilds().add(child);
 		return this;
 	}
 	
 	public XMLObject addAttribute(XMLAttribute<?> attribute) {
-		this.attributes.add(attribute);
+		this.getAttributes().add(attribute);
 		return this;
 	}
 	
+	public List<XMLAttribute<?>> getAttributes() {
+		return this.attributes;
+	}
+	
 	public String asXML() {
-		return "<" + this.name + attributeXML() + ">" + childXML() + "</" + this.name + ">";
+		return "<" + this.getName() + this.attributeXML() + ">" + this.childXML() + "</" + this.getName() + ">";
 	}
 	
 	public String attributeXML() {
 		StringBuilder attributes = new StringBuilder();
 		
-		if(!getAttributes().isEmpty()) {
+		if(!this.getAttributes().isEmpty()) {
 			attributes.append(" ");
-			for(XMLAttribute<?> attribute : getAttributes()) {
+			for(XMLAttribute<?> attribute : this.getAttributes()) {
 				attributes.append(attribute.name()).append("=\"").append(attribute.value()).append("\"").append(" ");
 			}
 			
@@ -135,8 +132,8 @@ public class XMLObject {
 	public String childXML() {
 		StringBuilder childs = new StringBuilder();
 		
-		if(!getChilds().isEmpty()) {
-			for(XMLObject child : getChilds())
+		if(!this.getChilds().isEmpty()) {
+			for(XMLObject child : this.getChilds())
 				childs.append(child.asXML());
 		}
 		
@@ -144,31 +141,27 @@ public class XMLObject {
 	}
 	
 	@Override
+	public int hashCode() {
+		return Objects.hash(this.getParent(), this.getName(), this.getAttributes(), this.getChilds());
+	}
+	
+	@Override
 	public String toString() {
 		return asXML();
 	}
+	
+	@Override
+	public boolean equals(Object o) {
+		if(this == o) return true;
+		if(o == null || getClass() != o.getClass()) return false;
+		XMLObject xmlObject = (XMLObject) o;
+		return Objects.equals(this.getParent(), xmlObject.getParent()) &&
+				Objects.equals(this.getName(), xmlObject.getName()) &&
+				Objects.equals(this.getAttributes(), xmlObject.getAttributes()) &&
+				Objects.equals(this.getChilds(), xmlObject.getChilds());
+	}
+	
+	public XMLObject getParent() {
+		return this.parent;
+	}
 }
-
-/*
-<Helium>
-  <month>190569550.80983543</month>
-  <screen>
-    <just>-979658551.006917</just>
-    <list>coat</list>
-    <tie>
-      <loose>-249825260</loose>
-      <blind>journey</blind>
-      <disease>half</disease>
-      <bush>gift</bush>
-      <length>1153300270.674245</length>
-    </tie>
-    <large>1074465088.265367</large>
-    <song>-1341621562.9766817</song>
-    <around>867249624</around>
-  </screen>
-  <position>-1450508043.4075212</position>
-  <best>lie</best>
-  <gently>-1828973292.2084568</gently>
-  <burn>review</burn>
-</Helium>
- */

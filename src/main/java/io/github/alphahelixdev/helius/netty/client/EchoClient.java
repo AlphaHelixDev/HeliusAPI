@@ -13,6 +13,7 @@ import io.netty.handler.codec.string.StringDecoder;
 import io.netty.handler.codec.string.StringEncoder;
 
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
 
@@ -45,12 +46,36 @@ public class EchoClient {
 		b.connect(host, port);
 	}
 	
-	public static Map<String, Consumer<JsonElement>> getRequests() {
-		return REQUESTS;
+	public void request(String sentData, Consumer<JsonElement> nettyCallback) {
+		this.getEch().requestData(sentData);
+		EchoClient.getRequests().put(sentData, nettyCallback);
 	}
 	
-	public void request(String sentData, Consumer<JsonElement> nettyCallback) {
-		ech.requestData(sentData);
-		REQUESTS.put(sentData, nettyCallback);
+	public EchoClientHandler getEch() {
+		return this.ech;
+	}
+	
+	public static Map<String, Consumer<JsonElement>> getRequests() {
+		return EchoClient.REQUESTS;
+	}
+	
+	@Override
+	public int hashCode() {
+		return Objects.hash(this.getEch());
+	}
+	
+	@Override
+	public boolean equals(Object o) {
+		if(this == o) return true;
+		if(o == null || getClass() != o.getClass()) return false;
+		EchoClient that = (EchoClient) o;
+		return Objects.equals(this.getEch(), that.getEch());
+	}
+	
+	@Override
+	public String toString() {
+		return "EchoClient{" +
+				"                            ech=" + this.ech +
+				'}';
 	}
 }

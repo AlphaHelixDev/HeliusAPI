@@ -32,6 +32,6 @@ public class XMLPropertyObject extends XMLObject {
 	}
 	
 	public String asXML() {
-		return "<" + getName() + attributeXML() + "/>";
+		return "<" + this.getName() + this.attributeXML() + "/>";
 	}
 }

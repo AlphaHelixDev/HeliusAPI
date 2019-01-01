@@ -12,7 +12,7 @@ public abstract class FileConfig extends ConfigSection {
 		if(filePath == null || filePath.equals(""))
 			return;
 		
-		save(new File(filePath));
+		this.save(new File(filePath));
 	}
 	
 	public void save(File file) throws IOException {
@@ -34,11 +34,11 @@ public abstract class FileConfig extends ConfigSection {
 		if(file == null || file.equals(""))
 			return;
 		
-		load(new File(file));
+		this.load(new File(file));
 	}
 	
 	public void load(File file) throws IOException {
-		load(new FileInputStream(file));
+		this.load(new FileInputStream(file));
 	}
 	
 	public void load(InputStream stream) throws IOException {
@@ -58,7 +58,7 @@ public abstract class FileConfig extends ConfigSection {
 			
 		}
 		
-		loadFromString(builder.toString());
+		this.loadFromString(builder.toString());
 	}
 	
 	public abstract void loadFromString(String contents);

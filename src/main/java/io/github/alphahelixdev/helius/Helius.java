@@ -37,15 +37,15 @@ public class Helius {
 	private static Logger log;
 	
 	static {
-		log = Logger.getLogger("Helius");
+		Helius.setLog(Logger.getLogger("Helius"));
 		System.setProperty("java.util.logging.SimpleFormatter.format",
 				"[%1$tF %1$tT] [%4$-7s]: %5$s %n");
 		
 		try {
-			File logFile = createFile(new File(HOME_PATH + "/helius/helius.log"));
+			File logFile = createFile(new File(Helius.getHomePath() + "/helius/helius.log"));
 			
 			FileHandler fh = new FileHandler(logFile.getAbsolutePath());
-			log.addHandler(fh);
+			Helius.getLog().addHandler(fh);
 			
 			fh.setFormatter(new Formatter() {
 				@Override
@@ -63,26 +63,34 @@ public class Helius {
 	}
 	
 	Helius() {
-		JsonReadFile appFile = new JsonReadFile(HOME_PATH + "/helius/apps.json");
+		JsonReadFile appFile = new JsonReadFile(Helius.getHomePath() + "/helius/apps.json");
 		
 		for(JsonElement obj : appFile.getArrayValues()) {
 			if(!obj.isJsonObject()) continue;
 			JsonObject info = (JsonObject) obj;
 			
 			try {
-				loadJar(new File(info.get("jar").getAsString()), info.get("main").getAsString()).newInstance();
-				log.info("Loaded " + info.get("name").getAsString());
+				Helius.loadJar(new File(info.get("jar").getAsString()), info.get("main").getAsString()).newInstance();
+				Helius.getLog().info("Loaded " + info.get("name").getAsString());
 			} catch(ReflectiveOperationException e) {
 				e.printStackTrace();
 			}
 		}
 		
-		log.info("Helius has been loaded!");
+		Helius.getLog().info("Helius has been loaded!");
 		startCacheClearTask();
 	}
 	
+	public static String getHomePath() {
+		return Helius.HOME_PATH;
+	}
+	
 	public static Class<?> loadJar(File jarFile, String mainClass) throws ClassNotFoundException {
-		return loadJar(jarFile, mainClass, Helius.class.getClassLoader());
+		return Helius.loadJar(jarFile, mainClass, Helius.class.getClassLoader());
+	}
+	
+	public static Logger getLog() {
+		return Helius.log;
 	}
 	
 	private static void startCacheClearTask() {
@@ -91,71 +99,25 @@ public class Helius {
 		timer.scheduleAtFixedRate(new TimerTask() {
 			@Override
 			public void run() {
-				for(Cache c : CACHES) {
+				for(Cache c : Helius.getCaches()) {
+					c.save();
 					c.clear();
-					log.info(c.clearMessage());
+					Helius.getLog().info(c.clearMessage());
 				}
 			}
-		}, Cache.time * 1000 * 60, Cache.time * 1000 * 60);
+		}, Cache.TIME * 1000 * 60, Cache.TIME * 1000 * 60);
 	}
 	
 	public static <T extends ClassLoader> Class<?> loadJar(File jarFile, String mainClass, T classLoader) throws ClassNotFoundException {
-		for(Class<?> classes : loadJar(jarFile, classLoader)) {
+		for(Class<?> classes : Helius.loadJar(jarFile, classLoader)) {
 			if(classes.getName().equals(mainClass))
 				return classes;
 		}
 		throw new ClassNotFoundException("Unable to find the main class '" + mainClass + "' inside '" + jarFile + "'");
 	}
 	
-	public static <T extends ClassLoader> Set<Class<?>> loadJar(File jarFile, T classLoader) {
-		Set<Class<?>> classes = new HashSet<>();
-		
-		try {
-			URLClassLoader loader;
-			
-			if(classLoader != null)
-				loader = new URLClassLoader(new URL[]{jarFile.toURI().toURL()}, classLoader);
-			else
-				loader = new URLClassLoader(new URL[]{jarFile.toURI().toURL()});
-			
-			JarFile file = new JarFile(jarFile);
-			
-			for(Enumeration<JarEntry> entries = file.entries(); entries.hasMoreElements(); ) {
-				JarEntry entry = entries.nextElement();
-				String jarName = entry.getName().replace('/', '.');
-				
-				if(jarName.endsWith(".class")) {
-					String clName = jarName.substring(0, jarName.length() - 6);
-					
-					if(clName.startsWith("io.github.alphahelixdev")) {
-						getLogger().info("Loading: " + clName + " for " + loader);
-						
-						Class<?> cls = Class.forName(clName, true, loader);
-						
-						if(cls != null)
-							classes.add(cls);
-					}
-				}
-			}
-			file.close();
-		} catch(IOException | ReflectiveOperationException ex) {
-			getLogger().severe("Error ocurred at getting classes, log: " + ex);
-			ex.printStackTrace();
-		}
-		
-		return classes;
-	}
-	
-	public static Logger getLogger() {
-		return log;
-	}
-	
-	public static Set<Class<?>> loadJar(File jarFile) {
-		return loadJar(jarFile, Helius.class.getClassLoader());
-	}
-	
-	public static void main(String[] args) {
-		instance = new Helius();
+	public static Set<Cache> getCaches() {
+		return Helius.CACHES;
 	}
 	
 	public static SQLTableHandler fastSQLiteConnect(String database, String table) throws NoConnectionException {
@@ -230,23 +192,78 @@ public class Helius {
 		}
 	}
 	
-	public static String getHomePath() {
-		return HOME_PATH;
+	public static <T extends ClassLoader> Set<Class<?>> loadJar(File jarFile, T classLoader) {
+		Set<Class<?>> classes = new HashSet<>();
+		
+		try {
+			URLClassLoader loader;
+			
+			if(classLoader != null)
+				loader = new URLClassLoader(new URL[]{jarFile.toURI().toURL()}, classLoader);
+			else
+				loader = new URLClassLoader(new URL[]{jarFile.toURI().toURL()});
+			
+			JarFile file = new JarFile(jarFile);
+			
+			for(Enumeration<JarEntry> entries = file.entries(); entries.hasMoreElements(); ) {
+				JarEntry entry = entries.nextElement();
+				String jarName = entry.getName().replace('/', '.');
+				
+				if(jarName.endsWith(".class")) {
+					String clName = jarName.substring(0, jarName.length() - 6);
+					
+					if(clName.startsWith("io.github.alphahelixdev")) {
+						getLogger().info("Loading: " + clName + " for " + loader);
+						
+						Class<?> cls = Class.forName(clName, true, loader);
+						
+						if(cls != null)
+							classes.add(cls);
+					}
+				}
+			}
+			file.close();
+		} catch(IOException | ReflectiveOperationException ex) {
+			Helius.getLog().severe("Error ocurred at getting classes, log: " + ex);
+			ex.printStackTrace();
+		}
+		
+		return classes;
+	}
+	
+	public static Logger getLogger() {
+		return Helius.getLog();
+	}
+	
+	public static void setLog(Logger log) {
+		Helius.log = log;
+	}
+	
+	public static Set<Class<?>> loadJar(File jarFile) {
+		return Helius.loadJar(jarFile, Helius.class.getClassLoader());
+	}
+	
+	public static void main(String[] args) {
+		Helius.setInstance(new Helius());
 	}
 	
 	public static HeliusCipher getCipher() {
-		return CIPHER;
+		return Helius.CIPHER;
 	}
 	
 	public static Reflections getReflections() {
-		return REFLECTIONS;
+		return Helius.REFLECTIONS;
 	}
 	
 	public static Helius getInstance() {
-		return instance;
+		return Helius.instance;
+	}
+	
+	public static void setInstance(Helius instance) {
+		Helius.instance = instance;
 	}
 	
 	public static void addCache(Cache cache) {
-		CACHES.add(cache);
+		Helius.getCaches().add(cache);
 	}
 }
