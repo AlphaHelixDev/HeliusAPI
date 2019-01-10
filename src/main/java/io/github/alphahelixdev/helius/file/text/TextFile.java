@@ -77,7 +77,7 @@ public class TextFile extends File {
 	@Override
 	public String toString() {
 		return "TextFile{" +
-				"                            content='" + this.content + '\'' +
+				"content='" + this.content + '\'' +
 				'}';
 	}
 }

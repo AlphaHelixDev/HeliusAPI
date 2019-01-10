@@ -31,8 +31,8 @@ public class ObjectTable {
 	
 	private void createTable() {
 		List<SQLColumn> columns = new ArrayList<>();
-		
-		for(SaveField field : Helius.getReflections().getDeclaredFields(this.getObjClass())) {
+
+		for(SaveField field : Helius.getReflections().getDeclaredFields(this.getObjClass(), true)) {
 			SQLConstraint constraint = null;
 			SQLDataType dataType = null;
 			

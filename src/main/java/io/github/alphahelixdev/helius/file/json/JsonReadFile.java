@@ -97,8 +97,8 @@ public class JsonReadFile extends File {
 	@Override
 	public String toString() {
 		return "JsonReadFile{" +
-				"                            gson=" + this.gson +
-				",                             element=" + this.element +
+				"gson=" + this.gson +
+				",element=" + this.element +
 				'}';
 	}
 }

@@ -202,30 +202,32 @@ public class WebReader {
 	public WebReader customQuery(String subPage, int millis, WebConsumer<HtmlPage> htmlPage) {
 		return this.customQuery(subPage, millis, true, htmlPage);
 	}
-	
-	@Override
-	public int hashCode() {
-		return Objects.hash(this.getUrl(), this.getCachedHTML());
-	}
-	
-	@Override
-	public boolean equals(Object o) {
-		if(this == o) return true;
-		if(o == null || getClass() != o.getClass()) return false;
-		WebReader reader = (WebReader) o;
-		return Objects.equals(this.getUrl(), reader.getUrl()) &&
-				Objects.equals(this.getCachedHTML(), reader.getCachedHTML());
-	}
-	
+
 	public String getUrl() {
 		return this.url;
 	}
-	
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(url, cachedHTML);
+	}
+
+	@Override
+	public boolean equals(Object o) {
+		if(this == o)
+			return true;
+		if(o == null || getClass() != o.getClass())
+			return false;
+		WebReader webReader = (WebReader) o;
+		return Objects.equals(url, webReader.url) &&
+				Objects.equals(cachedHTML, webReader.cachedHTML);
+	}
+
 	@Override
 	public String toString() {
 		return "WebReader{" +
-				"                            url='" + this.url + '\'' +
-				",                             cachedHTML='" + this.cachedHTML + '\'' +
+				"url='" + url + '\'' +
+				", cachedHTML='" + cachedHTML + '\'' +
 				'}';
 	}
 }

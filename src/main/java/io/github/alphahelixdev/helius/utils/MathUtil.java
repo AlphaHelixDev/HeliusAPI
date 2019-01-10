@@ -41,8 +41,10 @@ public class MathUtil {
 	}
 	
 	public static int decimals(double value) {
-		String v = String.valueOf(value).split("\\.")[1];
-		
-		return v.length();
+		return Integer.parseInt(String.valueOf(value).split("\\.")[1]);
+	}
+
+	public static int decimalAmount(double value) {
+		return String.valueOf(value).split("\\.")[1].length();
 	}
 }

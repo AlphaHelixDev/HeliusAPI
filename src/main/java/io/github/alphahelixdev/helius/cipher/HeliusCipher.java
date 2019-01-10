@@ -175,11 +175,13 @@ public class HeliusCipher {
 		HeliusCipher cipher = (HeliusCipher) o;
 		return this.getPrivateCipherKey() == cipher.getPrivateCipherKey();
 	}
-	
+
 	@Override
 	public String toString() {
 		return "HeliusCipher{" +
-				"                            privateCipherKey=" + this.privateCipherKey +
+				"privateCipherKey=" + privateCipherKey +
 				'}';
 	}
+
+
 }

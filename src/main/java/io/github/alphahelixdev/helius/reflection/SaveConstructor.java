@@ -3,20 +3,20 @@ package io.github.alphahelixdev.helius.reflection;
 import java.lang.reflect.Constructor;
 import java.util.Objects;
 
-public class SaveConstructor<T> {
-	
-	private final Constructor<T> constructor;
-	
-	public SaveConstructor(Class<T> clazz, Class<?>... parameters) throws NoSuchMethodException {
+public class SaveConstructor {
+
+	private final Constructor<?> constructor;
+
+	public SaveConstructor(Class<?> clazz, Class<?>... parameters) throws NoSuchMethodException {
 		this(clazz.getDeclaredConstructor(parameters));
 	}
-	
-	public SaveConstructor(Constructor<T> constructor) {
+
+	public SaveConstructor(Constructor<?> constructor) {
 		constructor.setAccessible(true);
 		this.constructor = constructor;
 	}
-	
-	public T newInstance(Boolean stackTrace, Object... args) {
+
+	public Object newInstance(Boolean stackTrace, Object... args) {
 		try {
 			return this.asNormal().newInstance(args);
 		} catch(Exception e) {
@@ -24,28 +24,28 @@ public class SaveConstructor<T> {
 		}
 		return null;
 	}
-	
-	public Constructor<T> asNormal() {
+
+	public Constructor<?> asNormal() {
 		return constructor;
 	}
-	
+
 	@Override
 	public int hashCode() {
-		return Objects.hash(this.constructor);
+		return Objects.hash(constructor);
 	}
-	
+
 	@Override
 	public boolean equals(Object o) {
 		if(this == o) return true;
 		if(o == null || getClass() != o.getClass()) return false;
-		SaveConstructor<?> that = (SaveConstructor<?>) o;
-		return Objects.equals(this.constructor, that.constructor);
+		SaveConstructor that = (SaveConstructor) o;
+		return Objects.equals(constructor, that.constructor);
 	}
-	
+
 	@Override
 	public String toString() {
 		return "SaveConstructor{" +
-				"                            constructor=" + this.constructor +
+				"constructor=" + constructor +
 				'}';
 	}
 }

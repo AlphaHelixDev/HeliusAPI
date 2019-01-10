@@ -13,9 +13,9 @@ public class ReflectiveCache implements Cache {
 	
 	private final MultiKeyMap<Object, SaveField> fieldMap = new MultiKeyMap<>();
 	private final MultiKeyMap<Object, SaveField> privateFieldMap = new MultiKeyMap<>();
-	
-	private final MultiKeyMap<Object, SaveConstructor<?>> constructorMap = new MultiKeyMap<>();
-	private final MultiKeyMap<Object, SaveConstructor<?>> privateConstructorMap = new MultiKeyMap<>();
+
+	private final MultiKeyMap<Object, SaveConstructor> constructorMap = new MultiKeyMap<>();
+	private final MultiKeyMap<Object, SaveConstructor> privateConstructorMap = new MultiKeyMap<>();
 	
 	private final MultiKeyMap<Object, Class<?>> classMap = new MultiKeyMap<>();
 	
@@ -52,12 +52,12 @@ public class ReflectiveCache implements Cache {
 	public MultiKeyMap<Object, SaveField> privateFields() {
 		return this.privateFieldMap;
 	}
-	
-	public MultiKeyMap<Object, SaveConstructor<?>> constructors() {
+
+	public MultiKeyMap<Object, SaveConstructor> constructors() {
 		return this.constructorMap;
 	}
-	
-	public MultiKeyMap<Object, SaveConstructor<?>> privateConstructors() {
+
+	public MultiKeyMap<Object, SaveConstructor> privateConstructors() {
 		return this.privateConstructorMap;
 	}
 	

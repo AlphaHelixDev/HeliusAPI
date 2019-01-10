@@ -10,19 +10,49 @@ public class NullExceptionHandler implements ExceptionHandler {
 	public SaveMethod noSuchMethod(Class<?> where, String name, Class<?>... parameterClasses) {
 		return null;
 	}
-	
+
+	@Override
+	public SaveMethod noSuchMethod(Class<?> where, Class<?> type) {
+		return null;
+	}
+
+	@Override
+	public SaveMethod noSuchMethod(Class<?> where, Class<?>... parameterTypes) {
+		return null;
+	}
+
+	@Override
+	public SaveMethod noSuchMethod(Class<?> where, String name) {
+		return null;
+	}
+
 	@Override
 	public SaveMethod noSuchPrivateMethod(Class<?> where, String name, Class<?>... parameterClasses) {
 		return null;
 	}
-	
+
 	@Override
-	public SaveConstructor<?> noSuchConstructor(Class<?> where, Class<?>... parameterClasses) {
+	public SaveMethod noSuchPrivateMethod(Class<?> where, Class<?> type) {
 		return null;
 	}
-	
+
 	@Override
-	public SaveConstructor<?> noSuchPrivateConstructor(Class<?> where, Class<?>... parameterClasses) {
+	public SaveMethod noSuchPrivateMethod(Class<?> where, Class<?>... parameterTypes) {
+		return null;
+	}
+
+	@Override
+	public SaveMethod noSuchPrivateMethod(Class<?> where, String name) {
+		return null;
+	}
+
+	@Override
+	public SaveConstructor noSuchConstructor(Class<?> where, Class<?>... parameterClasses) {
+		return null;
+	}
+
+	@Override
+	public SaveConstructor noSuchPrivateConstructor(Class<?> where, Class<?>... parameterClasses) {
 		return null;
 	}
 	

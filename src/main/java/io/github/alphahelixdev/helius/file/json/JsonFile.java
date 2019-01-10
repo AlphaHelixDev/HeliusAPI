@@ -161,8 +161,9 @@ public class JsonFile extends File {
 	
 	public JsonFile setValue(String path, Object value) {
 		Map.Entry<List<JsonObject>, List<String>> paths = getJsonPath(path);
-		
-		paths.getKey().get(paths.getKey().size() - 1).add(paths.getValue().get(paths.getValue().size() - 1), gson.toJsonTree(value));
+
+		paths.getKey().get(paths.getKey().size() - 1).add(paths.getValue().get(paths.getValue().size() - 1),
+		                                                  gson.toJsonTree(value));
 		
 		this.setHead(paths.getKey().get(0));
 		
@@ -199,8 +200,9 @@ public class JsonFile extends File {
 		if(!contains(path)) return null;
 		
 		Map.Entry<List<JsonObject>, List<String>> paths = getJsonPath(path);
-		
-		return this.getGson().fromJson(paths.getKey().get(paths.getKey().size() - 1).get(paths.getValue().get(paths.getValue().size() - 1)), valueClass);
+
+		return this.getGson().fromJson(paths.getKey().get(paths.getKey().size() - 1)
+		                                    .get(paths.getValue().get(paths.getValue().size() - 1)), valueClass);
 	}
 	
 	@Override
@@ -218,13 +220,13 @@ public class JsonFile extends File {
 	public int hashCode() {
 		return Objects.hash(super.hashCode(), this.getGson(), this.getHead(), this.getArrayHead());
 	}
-	
+
 	@Override
 	public String toString() {
 		return "JsonFile{" +
-				"                            gson=" + this.gson +
-				",                             head=" + this.head +
-				",                             arrayHead=" + this.arrayHead +
+				"gson=" + gson +
+				", head=" + head +
+				", arrayHead=" + arrayHead +
 				'}';
 	}
 }

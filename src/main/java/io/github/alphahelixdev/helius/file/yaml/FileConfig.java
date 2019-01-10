@@ -55,7 +55,6 @@ public abstract class FileConfig extends ConfigSection {
 				builder.append(line);
 				builder.append('\n');
 			}
-			
 		}
 		
 		this.loadFromString(builder.toString());

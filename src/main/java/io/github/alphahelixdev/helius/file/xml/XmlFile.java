@@ -35,7 +35,8 @@ public class XmlFile extends File {
 	}
 	
 	public XmlFile write(String name, Object obj) {
-		return update(XmlFile.getParser().toXMLObject(null, name, obj));
+		return update(XmlFile.getParser()
+		                     .toXMLObject(null, name, obj));
 	}
 	
 	public XmlFile update(XMLObject obj) {

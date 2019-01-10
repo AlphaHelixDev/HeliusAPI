@@ -26,22 +26,6 @@ public class SQLColumn {
 		this(name, columnType, -1, constraints);
 	}
 	
-	@Override
-	public int hashCode() {
-		return Objects.hash(this.getName(), this.getColumnType(), this.getSize(), this.getConstraints());
-	}
-	
-	@Override
-	public boolean equals(Object o) {
-		if(this == o) return true;
-		if(o == null || getClass() != o.getClass()) return false;
-		SQLColumn sqlColumn = (SQLColumn) o;
-		return this.getSize() == sqlColumn.getSize() &&
-				Objects.equals(this.getName(), sqlColumn.getName()) &&
-				Objects.equals(this.getColumnType(), sqlColumn.getColumnType()) &&
-				Objects.equals(this.getConstraints(), sqlColumn.getConstraints());
-	}
-	
 	public SQLColumn setName(String name) {
 		this.name = name;
 		return this;
@@ -90,5 +74,21 @@ public class SQLColumn {
 			column.append(" ").append(constraint);
 		
 		return column.append(",").toString();
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(name, columnType, size, constraints);
+	}
+
+	@Override
+	public boolean equals(Object o) {
+		if(this == o) return true;
+		if(o == null || getClass() != o.getClass()) return false;
+		SQLColumn sqlColumn = (SQLColumn) o;
+		return size == sqlColumn.size &&
+				Objects.equals(name, sqlColumn.name) &&
+				Objects.equals(columnType, sqlColumn.columnType) &&
+				Objects.equals(constraints, sqlColumn.constraints);
 	}
 }

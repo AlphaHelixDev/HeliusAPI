@@ -71,11 +71,11 @@ public class EchoClient {
 		EchoClient that = (EchoClient) o;
 		return Objects.equals(this.getEch(), that.getEch());
 	}
-	
+
 	@Override
 	public String toString() {
 		return "EchoClient{" +
-				"                            ech=" + this.ech +
+				"ech=" + ech +
 				'}';
 	}
 }

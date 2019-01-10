@@ -5,14 +5,26 @@ import io.github.alphahelixdev.helius.reflection.SaveField;
 import io.github.alphahelixdev.helius.reflection.SaveMethod;
 
 public interface ExceptionHandler {
-	
-	SaveMethod noSuchMethod(Class<?> where, String name, Class<?>... parameterClasses);
-	
-	SaveMethod noSuchPrivateMethod(Class<?> where, String name, Class<?>... parameterClasses);
-	
-	SaveConstructor<?> noSuchConstructor(Class<?> where, Class<?>... parameterClasses);
-	
-	SaveConstructor<?> noSuchPrivateConstructor(Class<?> where, Class<?>... parameterClasses);
+
+	SaveMethod noSuchMethod(Class<?> where, String name, Class<?>... parameterTypes);
+
+	SaveMethod noSuchMethod(Class<?> where, Class<?> type);
+
+	SaveMethod noSuchMethod(Class<?> where, Class<?>... parameterTypes);
+
+	SaveMethod noSuchMethod(Class<?> where, String name);
+
+	SaveMethod noSuchPrivateMethod(Class<?> where, String name, Class<?>... parameterTypes);
+
+	SaveMethod noSuchPrivateMethod(Class<?> where, Class<?> type);
+
+	SaveMethod noSuchPrivateMethod(Class<?> where, Class<?>... parameterTypes);
+
+	SaveMethod noSuchPrivateMethod(Class<?> where, String name);
+
+	SaveConstructor noSuchConstructor(Class<?> where, Class<?>... parameterTypes);
+
+	SaveConstructor noSuchPrivateConstructor(Class<?> where, Class<?>... parameterTypes);
 	
 	SaveField noSuchField(Class<?> where, String name);
 	

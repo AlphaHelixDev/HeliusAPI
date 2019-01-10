@@ -3,13 +3,13 @@ package io.github.alphahelixdev.helius.netty.client;
 import com.google.gson.JsonParser;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelFuture;
+import io.netty.channel.ChannelHandlerAdapter;
 import io.netty.channel.ChannelHandlerContext;
-import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.util.CharsetUtil;
 
 import java.util.Objects;
 
-public class EchoClientHandler extends ChannelInboundHandlerAdapter {
+public class EchoClientHandler extends ChannelHandlerAdapter {
 	
 	private ChannelHandlerContext ctx;
 	
@@ -73,11 +73,11 @@ public class EchoClientHandler extends ChannelInboundHandlerAdapter {
 		EchoClientHandler that = (EchoClientHandler) o;
 		return Objects.equals(this.getCtx(), that.getCtx());
 	}
-	
+
 	@Override
 	public String toString() {
 		return "EchoClientHandler{" +
-				"                            ctx=" + this.ctx +
+				"ctx=" + ctx +
 				'}';
 	}
 }

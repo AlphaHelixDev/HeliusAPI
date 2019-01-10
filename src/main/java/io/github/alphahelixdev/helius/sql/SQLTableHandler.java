@@ -70,7 +70,8 @@ public class SQLTableHandler {
 	}
 	
 	public SQLTableHandler addForeignKey(String changeColumn, String otherTable, String otherColumn) {
-		return this.customQuery("ALTER TABLE " + this.getTable() + " ADD FOREIGN KEY (" + changeColumn + ") REFERENCES " + otherTable + "(" + otherColumn + ")", resultSet -> {});
+		return this.customQuery("ALTER TABLE " + this.getTable() + " ADD FOREIGN KEY (" + changeColumn + ") REFERENCES" +
+				                        " " + otherTable + "(" + otherColumn + ") ON UPDATE CASCADE", resultSet -> {});
 	}
 	
 	public SQLTableHandler customQuery(String qry, Consumer<ResultSet> callback) {

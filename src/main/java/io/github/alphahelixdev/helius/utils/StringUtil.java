@@ -2,8 +2,10 @@ package io.github.alphahelixdev.helius.utils;
 
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
 import java.util.Scanner;
 import java.util.concurrent.ThreadLocalRandom;
+import java.util.stream.Collectors;
 
 public class StringUtil {
 	
@@ -50,23 +52,13 @@ public class StringUtil {
 			return string;
 		}
 	}
-	
-	public static Collection<String> upperEverything(Collection<String> collection) {
-		String[] strings = collection.toArray(new String[collection.size()]);
-		collection.clear();
-		
-		for(String str : strings)
-			collection.add(str.toLowerCase());
-		return collection;
+
+	public static List<String> upperEverything(Collection<String> collection) {
+		return collection.stream().map(String::toUpperCase).collect(Collectors.toList());
 	}
-	
-	public static Collection<String> lowerEverything(Collection<String> collection) {
-		String[] strings = collection.toArray(new String[collection.size()]);
-		collection.clear();
-		
-		for(String str : strings)
-			collection.add(str.toLowerCase());
-		return collection;
+
+	public static List<String> lowerEverything(Collection<String> collection) {
+		return collection.stream().map(String::toLowerCase).collect(Collectors.toList());
 	}
 	
 	public static boolean matches(String str, String... possible) {

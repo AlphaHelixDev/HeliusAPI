@@ -1,8 +1,10 @@
 package io.github.alphahelixdev.helius.utils;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class ArrayUtil {
 	
@@ -18,12 +20,8 @@ public class ArrayUtil {
 	}
 	
 	public static <T> List<T> getTypesOf(Class<T> clazzType, Object... list) {
-		List<T> types = new ArrayList<>();
-		
-		for(Object o : list)
-			if(o.getClass().isInstance(clazzType))
-				types.add((T) o);
-		return types;
+		return (List<T>) Arrays.stream(list).filter(o -> o.getClass().isInstance(clazzType))
+		                       .collect(Collectors.toList());
 	}
 	
 	public static void checkForLength(int min, int max, Collection<Object> list) {
@@ -32,7 +30,8 @@ public class ArrayUtil {
 	
 	public static void checkForLength(int min, int max, Object... array) {
 		if(array.length < min || array.length > max)
-			throw new ArrayIndexOutOfBoundsException("You have to at least parse " + min + " arguments and up to " + max);
+			throw new ArrayIndexOutOfBoundsException("You have to at least parse " + min + " arguments and up to "
+					                                         + max);
 	}
 	
 	@SafeVarargs
@@ -46,111 +45,39 @@ public class ArrayUtil {
 	}
 	
 	public static double min(double... a) {
-		double lowest = a[0];
-		
-		for(double l : a)
-			lowest = Math.min(l, lowest);
-		
-		return lowest;
+		return Arrays.stream(a).min().orElse(a[0]);
 	}
 	
 	public static int min(int... a) {
-		int lowest = a[0];
-		
-		for(int l : a)
-			lowest = Math.min(l, lowest);
-		
-		return lowest;
+		return Arrays.stream(a).min().orElse(a[0]);
 	}
 	
 	public static long min(long... a) {
-		long lowest = a[0];
-		
-		for(long l : a)
-			lowest = Math.min(l, lowest);
-		
-		return lowest;
-	}
-	
-	public static float min(float... a) {
-		float lowest = a[0];
-		
-		for(float l : a)
-			lowest = Math.min(l, lowest);
-		
-		return lowest;
+		return Arrays.stream(a).min().orElse(a[0]);
 	}
 	
 	public static double max(double... a) {
-		double highest = a[0];
-		
-		for(double l : a)
-			highest = Math.max(l, highest);
-		
-		return highest;
+		return Arrays.stream(a).max().orElse(a[0]);
 	}
 	
 	public static int max(int... a) {
-		int highest = a[0];
-		
-		for(int l : a)
-			highest = Math.max(l, highest);
-		
-		return highest;
+		return Arrays.stream(a).max().orElse(a[0]);
 	}
 	
 	public static long max(long... a) {
-		long highest = a[0];
-		
-		for(long l : a)
-			highest = Math.max(l, highest);
-		
-		return highest;
-	}
-	
-	public static float max(float... a) {
-		float highest = a[0];
-		
-		for(float l : a)
-			highest = Math.max(l, highest);
-		
-		return highest;
+		return Arrays.stream(a).max().orElse(a[0]);
 	}
 	
 	public static double sum(double... a) {
-		double sum = a[0];
-		
-		for(double s : a)
-			sum += s;
-		
-		return sum;
+		return Arrays.stream(a).sum();
 	}
 	
 	public static int sum(int... a) {
-		int sum = a[0];
-		
-		for(int s : a)
-			sum += s;
-		
-		return sum;
+		return Arrays.stream(a).sum();
 	}
-	
-	public static float sum(float... a) {
-		float sum = a[0];
-		
-		for(float s : a)
-			sum += s;
-		
-		return sum;
-	}
-	
+
 	public static long sum(long... a) {
-		long sum = a[0];
-		
-		for(long s : a)
-			sum += s;
-		
-		return sum;
+		return Arrays.stream(a).sum();
 	}
 	
 	public static double[] trim(int decimal, double... a) {
@@ -162,10 +89,17 @@ public class ArrayUtil {
 	
 	public static double[][] trim(int decimal, double[]... coordinates) {
 		for(int i = 0; i < coordinates.length; i++) {
-			coordinates[i] = new double[]{MathUtil.trim(coordinates[i][0], decimal), MathUtil.trim(coordinates[i][1], decimal),
+			coordinates[i] = new double[]{MathUtil.trim(coordinates[i][0], decimal), MathUtil.trim(coordinates[i][1],
+			                                                                                       decimal),
 					MathUtil.trim(coordinates[i][2], decimal)};
 		}
 		return coordinates;
 	}
-	
+
+	public static <T> List<T> merge(List<List<T>> list) {
+		return list.stream().reduce((l1, l2) -> {
+			l1.addAll(l2);
+			return l1;
+		}).orElse(new ArrayList<>());
+	}
 }

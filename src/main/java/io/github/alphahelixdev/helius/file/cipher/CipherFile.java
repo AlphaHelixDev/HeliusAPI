@@ -61,7 +61,7 @@ public class CipherFile extends TextFile {
 	@Override
 	public String toString() {
 		return "CipherFile{" +
-				"                            cipher=" + this.cipher +
+				"cipher=" + this.cipher +
 				'}';
 	}
 	
