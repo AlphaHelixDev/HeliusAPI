@@ -2,15 +2,26 @@ package io.github.alphahelixdev.helius.file.json;
 
 import com.google.gson.*;
 import io.github.alphahelixdev.helius.Helius;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
 
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.net.URI;
-import java.util.*;
+import java.util.AbstractMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 import java.util.function.Consumer;
 
+@Getter
+@Setter
+@EqualsAndHashCode
+@ToString
 public class JsonFile extends File {
 	
 	private final Gson gson = new GsonBuilder().setPrettyPrinting().create();
@@ -22,25 +33,6 @@ public class JsonFile extends File {
 		Helius.createFile(this);
 		this.setArrayHead(readArray());
 		this.setHead((JsonObject) arrayHead.get(0));
-	}
-	
-	private JsonArray readArray() {
-		String file = Helius.read(this);
-		JsonArray array = new JsonArray();
-		
-		if(file.isEmpty() || !(file.startsWith("[") || file.endsWith("]"))) {
-			array.add(new JsonObject());
-			
-			return array;
-		}
-		
-		array = this.getGson().fromJson(file, JsonArray.class);
-		
-		return array;
-	}
-	
-	public Gson getGson() {
-		return this.gson;
 	}
 	
 	public JsonFile(String parent, String child) {
@@ -64,6 +56,21 @@ public class JsonFile extends File {
 		this.setHead((JsonObject) arrayHead.get(0));
 	}
 	
+	private JsonArray readArray() {
+		String file = Helius.read(this);
+		JsonArray array = new JsonArray();
+		
+		if(file.isEmpty() || !(file.startsWith("[") || file.endsWith("]"))) {
+			array.add(new JsonObject());
+			
+			return array;
+		}
+		
+		array = this.getGson().fromJson(file, JsonArray.class);
+		
+		return array;
+	}
+	
 	public JsonFile addArrayValue(Object value) {
 		JsonObject obj = new JsonObject();
 		
@@ -74,10 +81,6 @@ public class JsonFile extends File {
 		return update();
 	}
 	
-	public JsonArray getArrayHead() {
-		return this.arrayHead;
-	}
-	
 	public JsonFile update() {
 		try(BufferedWriter writer = new BufferedWriter(new FileWriter(this))) {
 			this.getArrayHead().set(0, this.getHead());
@@ -86,10 +89,6 @@ public class JsonFile extends File {
 			e.printStackTrace();
 		}
 		return this;
-	}
-	
-	public JsonObject getHead() {
-		return this.head;
 	}
 	
 	public JsonFile setDefaultValue(String path, Object value) {
@@ -106,16 +105,6 @@ public class JsonFile extends File {
 				return false;
 		}
 		return true;
-	}
-	
-	public JsonFile setHead(JsonObject head) {
-		this.head = head;
-		return this;
-	}
-	
-	public JsonFile setArrayHead(JsonArray arrayHead) {
-		this.arrayHead = arrayHead;
-		return this;
 	}
 	
 	public <T> JsonFile edit(String path, Class<T> valueClass, Consumer<T> consumer) {
@@ -161,9 +150,9 @@ public class JsonFile extends File {
 	
 	public JsonFile setValue(String path, Object value) {
 		Map.Entry<List<JsonObject>, List<String>> paths = getJsonPath(path);
-
+		
 		paths.getKey().get(paths.getKey().size() - 1).add(paths.getValue().get(paths.getValue().size() - 1),
-		                                                  gson.toJsonTree(value));
+				gson.toJsonTree(value));
 		
 		this.setHead(paths.getKey().get(0));
 		
@@ -200,33 +189,8 @@ public class JsonFile extends File {
 		if(!contains(path)) return null;
 		
 		Map.Entry<List<JsonObject>, List<String>> paths = getJsonPath(path);
-
+		
 		return this.getGson().fromJson(paths.getKey().get(paths.getKey().size() - 1)
-		                                    .get(paths.getValue().get(paths.getValue().size() - 1)), valueClass);
-	}
-	
-	@Override
-	public boolean equals(Object o) {
-		if(this == o) return true;
-		if(o == null || getClass() != o.getClass()) return false;
-		if(!super.equals(o)) return false;
-		JsonFile jsonFile = (JsonFile) o;
-		return Objects.equals(this.getGson(), jsonFile.getGson()) &&
-				Objects.equals(this.getHead(), jsonFile.getHead()) &&
-				Objects.equals(this.getArrayHead(), jsonFile.getArrayHead());
-	}
-	
-	@Override
-	public int hashCode() {
-		return Objects.hash(super.hashCode(), this.getGson(), this.getHead(), this.getArrayHead());
-	}
-
-	@Override
-	public String toString() {
-		return "JsonFile{" +
-				"gson=" + gson +
-				", head=" + head +
-				", arrayHead=" + arrayHead +
-				'}';
+				.get(paths.getValue().get(paths.getValue().size() - 1)), valueClass);
 	}
 }

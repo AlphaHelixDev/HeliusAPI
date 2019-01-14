@@ -11,57 +11,60 @@ import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.handler.codec.string.StringEncoder;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Objects;
 
+@Getter
+@Setter
+@EqualsAndHashCode
+@ToString
 public class EchoServer {
-
+	
 	private static final Map<String, RequestProcessor> REPROCESSOR_MAP = new HashMap<>();
 	private final int port;
 	private final EventLoopGroup workerGroup = new NioEventLoopGroup();
 	private ChannelFuture f;
-
+	
 	public EchoServer(int port) {
 		this.port = port;
 	}
-
+	
 	public static void addRequestProcessor(String data, RequestProcessor requestProcessor) {
 		EchoServer.getReprocessorMap().put(data, requestProcessor);
 	}
-
+	
 	public static Map<String, RequestProcessor> getReprocessorMap() {
 		return EchoServer.REPROCESSOR_MAP;
 	}
-
+	
 	public static RequestProcessor process(String data) {
 		return EchoServer.getReprocessorMap().get(data);
 	}
-
+	
 	public void start() {
 		ServerBootstrap b = new ServerBootstrap();
-
+		
 		b.group(this.getWorkerGroup())
-		 .channel(NioServerSocketChannel.class)
-		 .option(ChannelOption.SO_KEEPALIVE, true)
-		 .childHandler(new ChannelInitializer<SocketChannel>() {
-			 @Override
-			 protected void initChannel(SocketChannel socketChannel) {
-				 Helius.getLogger().info("New client connected! Onto (" + socketChannel.localAddress() + ")");
-
-				 socketChannel.pipeline().addLast(new StringEncoder()).addLast(new StringEncoder())
-				              .addLast(new EchoServerHandler());
-			 }
-		 });
-
+				.channel(NioServerSocketChannel.class)
+				.option(ChannelOption.SO_KEEPALIVE, true)
+				.childHandler(new ChannelInitializer<SocketChannel>() {
+					@Override
+					protected void initChannel(SocketChannel socketChannel) {
+						Helius.getLogger().info("New client connected! Onto (" + socketChannel.localAddress() + ")");
+						
+						socketChannel.pipeline().addLast(new StringEncoder()).addLast(new StringEncoder())
+								.addLast(new EchoServerHandler());
+					}
+				});
+		
 		this.setF(b.bind(port));
 	}
-
-	public EventLoopGroup getWorkerGroup() {
-		return this.workerGroup;
-	}
-
+	
 	public void stop() {
 		try {
 			this.getF().channel().close().sync();
@@ -69,44 +72,5 @@ public class EchoServer {
 		} catch(InterruptedException e) {
 			e.printStackTrace();
 		}
-	}
-
-	public ChannelFuture getF() {
-		return this.f;
-	}
-
-	public EchoServer setF(ChannelFuture f) {
-		this.f = f;
-		return this;
-	}
-
-	public int getPort() {
-		return this.port;
-	}
-
-	@Override
-	public int hashCode() {
-		return Objects.hash(port, workerGroup, f);
-	}
-
-	@Override
-	public boolean equals(Object o) {
-		if(this == o)
-			return true;
-		if(o == null || getClass() != o.getClass())
-			return false;
-		EchoServer that = (EchoServer) o;
-		return port == that.port &&
-				Objects.equals(workerGroup, that.workerGroup) &&
-				Objects.equals(f, that.f);
-	}
-
-	@Override
-	public String toString() {
-		return "EchoServer{" +
-				"port=" + port +
-				", workerGroup=" + workerGroup +
-				", f=" + f +
-				'}';
 	}
 }

@@ -11,12 +11,17 @@ import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
 import io.netty.handler.codec.string.StringDecoder;
 import io.netty.handler.codec.string.StringEncoder;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.ToString;
 
 import java.util.Map;
-import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
 
+@Getter
+@EqualsAndHashCode
+@ToString
 public class EchoClient {
 	
 	//Request name -> CallBack
@@ -51,31 +56,7 @@ public class EchoClient {
 		EchoClient.getRequests().put(sentData, nettyCallback);
 	}
 	
-	public EchoClientHandler getEch() {
-		return this.ech;
-	}
-	
 	public static Map<String, Consumer<JsonElement>> getRequests() {
 		return EchoClient.REQUESTS;
-	}
-	
-	@Override
-	public int hashCode() {
-		return Objects.hash(this.getEch());
-	}
-	
-	@Override
-	public boolean equals(Object o) {
-		if(this == o) return true;
-		if(o == null || getClass() != o.getClass()) return false;
-		EchoClient that = (EchoClient) o;
-		return Objects.equals(this.getEch(), that.getEch());
-	}
-
-	@Override
-	public String toString() {
-		return "EchoClient{" +
-				"ech=" + ech +
-				'}';
 	}
 }

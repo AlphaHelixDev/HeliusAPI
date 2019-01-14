@@ -4,10 +4,18 @@ import com.google.gson.JsonElement;
 import io.github.alphahelixdev.helius.Helius;
 import io.github.alphahelixdev.helius.netty.client.EchoClient;
 import io.github.alphahelixdev.helius.netty.server.EchoServer;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
 
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.function.Consumer;
 
+@Getter
+@Setter
+@EqualsAndHashCode
+@ToString
 public class ServerConnector {
 	
 	private EchoServer server;
@@ -19,7 +27,7 @@ public class ServerConnector {
 			return;
 		}
 		
-		this.setOwnServer(new EchoServer(ownPort));
+		this.setServer(new EchoServer(ownPort));
 		if(!host.isEmpty())
 			this.setClient(new EchoClient(host, port));
 		
@@ -27,36 +35,18 @@ public class ServerConnector {
 		
 		executor.execute(() -> {
 			try {
-				this.getOwnServer().start();
+				this.getServer().start();
 			} catch(Exception e) {
 				e.printStackTrace();
 			}
 		});
 	}
 	
-	public EchoServer getOwnServer() {
-		return this.server;
-	}
-	
-	public ServerConnector setOwnServer(EchoServer server) {
-		this.server = server;
-		return this;
-	}
-	
 	public void makeRequest(String request, Consumer<JsonElement> callback) {
 		this.getClient().request(request, callback);
 	}
 	
-	public EchoClient getClient() {
-		return this.client;
-	}
-	
 	public void addRequestProcessor(String request, RequestProcessor reprocessor) {
 		EchoServer.addRequestProcessor(request, reprocessor);
-	}
-	
-	public ServerConnector setClient(EchoClient client) {
-		this.client = client;
-		return this;
 	}
 }

@@ -1,15 +1,14 @@
 package io.github.alphahelixdev.helius;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import io.github.alphahelixdev.helius.cipher.HeliusCipher;
 import io.github.alphahelixdev.helius.file.json.JsonReadFile;
 import io.github.alphahelixdev.helius.reflection.Reflections;
-import io.github.alphahelixdev.helius.sql.SQLInformation;
-import io.github.alphahelixdev.helius.sql.SQLTableHandler;
-import io.github.alphahelixdev.helius.sql.exceptions.NoConnectionException;
-import io.github.alphahelixdev.helius.sql.mysql.MySQLConnector;
-import io.github.alphahelixdev.helius.sql.sqlite.SQLiteConnector;
+import lombok.Getter;
+import lombok.Setter;
 import org.apache.commons.io.FileUtils;
 
 import java.io.File;
@@ -32,8 +31,15 @@ public class Helius {
 	private static final Set<Cache> CACHES = new HashSet<>();
 	private static final HeliusCipher CIPHER = new HeliusCipher();
 	private static final Reflections REFLECTIONS = new Reflections();
+	private static final Gson GSON = new GsonBuilder().create();
 	private static final String HOME_PATH = System.getProperty("user.home") + "/storage";
+	@Getter
+	@Setter
 	private static Helius instance;
+	@Getter
+	private static Timer cacheTimer;
+	@Getter
+	@Setter
 	private static Logger log;
 
 	static {
@@ -79,8 +85,8 @@ public class Helius {
 			}
 		}
 
-		Helius.getLog().info("Helius has been loaded!");
 		startCacheClearTask();
+		Helius.getLog().info("Helius has been loaded!");
 	}
 
 	public static String getHomePath() {
@@ -91,14 +97,13 @@ public class Helius {
 		return Helius.loadJar(jarFile, mainClass, Helius.class.getClassLoader());
 	}
 
-	public static Logger getLog() {
-		return Helius.log;
-	}
-
 	private static void startCacheClearTask() {
-		Timer timer = new Timer();
-
-		timer.scheduleAtFixedRate(new TimerTask() {
+		if(cacheTimer != null)
+			return;
+		
+		cacheTimer = new Timer();
+		
+		cacheTimer.scheduleAtFixedRate(new TimerTask() {
 			@Override
 			public void run() {
 				for(Cache c : Helius.getCaches()) {
@@ -162,22 +167,6 @@ public class Helius {
 		return classes;
 	}
 
-	public static SQLTableHandler fastSQLiteConnect(String database, String table) throws NoConnectionException {
-		File dbFile = new File(database);
-
-		if(dbFile.getParentFile().mkdirs())
-			try {
-				dbFile.createNewFile();
-			} catch(IOException e) {
-				throw new NoConnectionException(database);
-			}
-
-		SQLiteConnector connector = new SQLiteConnector(() -> database);
-
-		connector.connect();
-		return connector.handler(table);
-	}
-
 	public static File createFile(File file) {
 		if(!file.exists() && !file.isDirectory()) {
 			try {
@@ -209,14 +198,6 @@ public class Helius {
 		return text.replaceFirst("(?s)(.*)" + regex, "$1" + replacement);
 	}
 
-	public static SQLTableHandler fastMySQLConnect(SQLInformation information, String table)
-	throws NoConnectionException {
-		MySQLConnector connector = new MySQLConnector(information);
-
-		connector.connect();
-		return connector.handler(table);
-	}
-
 	public static <V> V runAsync(Callable<V> task) {
 		ExecutorService service = Executors.newFixedThreadPool(1);
 		CompletionService<V> completionService = new ExecutorCompletionService<>(service);
@@ -235,18 +216,14 @@ public class Helius {
 		}
 	}
 
-	public static Logger getLogger() {
-		return Helius.getLog();
-	}
-
-	public static void setLog(Logger log) {
-		Helius.log = log;
-	}
-
 	public static Set<Class<?>> loadJar(File jarFile) {
 		return Helius.loadJar(jarFile, Helius.class.getClassLoader());
 	}
-
+	
+	public static Logger getLogger() {
+		return getLog();
+	}
+	
 	public static void main(String[] args) {
 		Helius.setInstance(new Helius());
 	}
@@ -258,15 +235,11 @@ public class Helius {
 	public static Reflections getReflections() {
 		return Helius.REFLECTIONS;
 	}
-
-	public static Helius getInstance() {
-		return Helius.instance;
+	
+	public static Gson getGson() {
+		return Helius.GSON;
 	}
-
-	public static void setInstance(Helius instance) {
-		Helius.instance = instance;
-	}
-
+	
 	public static void addCache(Cache cache) {
 		Helius.getCaches().add(cache);
 	}

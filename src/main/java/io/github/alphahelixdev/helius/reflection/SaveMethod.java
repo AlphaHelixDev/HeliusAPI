@@ -1,9 +1,13 @@
 package io.github.alphahelixdev.helius.reflection;
 
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
+
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.Objects;
 
+@EqualsAndHashCode
+@ToString
 public class SaveMethod {
 	
 	private final Method method;
@@ -32,25 +36,5 @@ public class SaveMethod {
 	
 	public Method asNormal() {
 		return method;
-	}
-	
-	@Override
-	public int hashCode() {
-		return Objects.hash(this.method);
-	}
-	
-	@Override
-	public boolean equals(Object o) {
-		if(this == o) return true;
-		if(o == null || getClass() != o.getClass()) return false;
-		SaveMethod that = (SaveMethod) o;
-		return Objects.equals(this.method, that.method);
-	}
-	
-	@Override
-	public String toString() {
-		return "SaveMethod{" +
-				"method=" + this.method +
-				'}';
 	}
 }

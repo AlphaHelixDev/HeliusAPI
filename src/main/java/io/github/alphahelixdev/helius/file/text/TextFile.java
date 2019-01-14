@@ -1,14 +1,21 @@
 package io.github.alphahelixdev.helius.file.text;
 
 import io.github.alphahelixdev.helius.Helius;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
 
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.net.URI;
-import java.util.Objects;
 
+@Getter
+@Setter
+@EqualsAndHashCode
+@ToString
 public class TextFile extends File {
 	
 	private String content;
@@ -49,35 +56,5 @@ public class TextFile extends File {
 			e.printStackTrace();
 		}
 		return this;
-	}
-	
-	public String getContent() {
-		return this.content;
-	}
-	
-	public TextFile setContent(String content) {
-		this.content = content;
-		return this;
-	}
-	
-	@Override
-	public boolean equals(Object o) {
-		if(this == o) return true;
-		if(o == null || getClass() != o.getClass()) return false;
-		if(!super.equals(o)) return false;
-		TextFile textFile = (TextFile) o;
-		return Objects.equals(this.getContent(), textFile.getContent());
-	}
-	
-	@Override
-	public int hashCode() {
-		return Objects.hash(super.hashCode(), this.getContent());
-	}
-	
-	@Override
-	public String toString() {
-		return "TextFile{" +
-				"content='" + this.content + '\'' +
-				'}';
 	}
 }

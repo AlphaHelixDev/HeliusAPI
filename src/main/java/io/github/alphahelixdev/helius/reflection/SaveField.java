@@ -1,12 +1,18 @@
 package io.github.alphahelixdev.helius.reflection;
 
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.ToString;
+
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
-import java.util.Objects;
 
+@EqualsAndHashCode
+@ToString
 public class SaveField {
 	
 	private final Field field;
+	@Getter
 	private final int classIndex;
 	
 	public SaveField(Field field) {
@@ -76,31 +82,5 @@ public class SaveField {
 	
 	public SaveField setStatic(Object value, boolean stackTrace) {
 		return this.set(null, value, stackTrace);
-	}
-	
-	@Override
-	public int hashCode() {
-		return Objects.hash(this.field, this.getClassIndex());
-	}
-	
-	@Override
-	public boolean equals(Object o) {
-		if(this == o) return true;
-		if(o == null || getClass() != o.getClass()) return false;
-		SaveField saveField = (SaveField) o;
-		return this.getClassIndex() == saveField.getClassIndex() &&
-				Objects.equals(this.field, saveField.field);
-	}
-	
-	public int getClassIndex() {
-		return this.classIndex;
-	}
-	
-	@Override
-	public String toString() {
-		return "SaveField{" +
-				"                            field=" + this.field +
-				",                             classIndex=" + this.classIndex +
-				'}';
 	}
 }

@@ -1,9 +1,15 @@
 package io.github.alphahelixdev.helius.xml;
 
 import com.google.common.collect.ImmutableList;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.util.List;
 
+@Getter
+@Setter
+@EqualsAndHashCode(callSuper = true)
 public class XMLStubObject<T> extends XMLObject {
 	
 	private T value;
@@ -46,9 +52,5 @@ public class XMLStubObject<T> extends XMLObject {
 	@Override
 	public XMLObject addChild(XMLObject child) {
 		return this;
-	}
-	
-	public T getValue() {
-		return this.value;
 	}
 }

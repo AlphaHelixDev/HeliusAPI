@@ -1,10 +1,15 @@
 package io.github.alphahelixdev.helius.cipher;
 
 import com.google.common.collect.ImmutableMap;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.ToString;
 
 import java.util.Map;
-import java.util.Objects;
 
+@Getter
+@EqualsAndHashCode
+@ToString
 public class HeliusCipher {
 	
 	private static final Map<Character, Short> ALPHABETICAL_NUMBERS = ImmutableMap.<Character, Short>builder()
@@ -107,9 +112,9 @@ public class HeliusCipher {
 	}
 	
 	private static char getByShort(short code) {
-		for(Map.Entry<Character, Short> e : HeliusCipher.getAlphabeticalNumbers().entrySet()) {
+		for(Map.Entry<Character, Short> e : HeliusCipher.getAlphabeticalNumbers().entrySet())
 			if(e.getValue() == code) return e.getKey();
-		}
+		
 		return '�';
 	}
 	
@@ -135,15 +140,11 @@ public class HeliusCipher {
 		return encoder.insert(0, "HCE{").append("}").toString();
 	}
 	
-	public long getPrivateCipherKey() {
-		return this.privateCipherKey;
-	}
-	
 	private String upToEight(String full) {
 		StringBuilder ne = new StringBuilder(full);
-		for(int i = 0; i < HeliusCipher.getSubSize() && ne.length() < HeliusCipher.getSubSize(); i++) {
+		for(int i = 0; i < HeliusCipher.getSubSize() && ne.length() < HeliusCipher.getSubSize(); i++)
 			ne.insert(0, "0");
-		}
+		
 		return ne.toString();
 	}
 	
@@ -162,26 +163,4 @@ public class HeliusCipher {
 		}
 		return normal.toString();
 	}
-	
-	@Override
-	public int hashCode() {
-		return Objects.hash(this.getPrivateCipherKey());
-	}
-	
-	@Override
-	public boolean equals(Object o) {
-		if(this == o) return true;
-		if(o == null || getClass() != o.getClass()) return false;
-		HeliusCipher cipher = (HeliusCipher) o;
-		return this.getPrivateCipherKey() == cipher.getPrivateCipherKey();
-	}
-
-	@Override
-	public String toString() {
-		return "HeliusCipher{" +
-				"privateCipherKey=" + privateCipherKey +
-				'}';
-	}
-
-
 }

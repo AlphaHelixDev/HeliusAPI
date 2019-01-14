@@ -9,14 +9,21 @@ import com.gargoylesoftware.htmlunit.WebClient;
 import com.gargoylesoftware.htmlunit.html.HTMLParserListener;
 import com.gargoylesoftware.htmlunit.html.HtmlPage;
 import com.gargoylesoftware.htmlunit.javascript.JavaScriptErrorListener;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
 import org.apache.commons.logging.LogFactory;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.Objects;
 import java.util.logging.Level;
 
+@Getter
+@Setter
+@EqualsAndHashCode
+@ToString
 public class WebReader {
 	
 	private static final WebClient CLIENT = new WebClient(BrowserVersion.BEST_SUPPORTED);
@@ -110,15 +117,6 @@ public class WebReader {
 		return WebReader.CLIENT;
 	}
 	
-	public String getCachedHTML() {
-		return this.cachedHTML;
-	}
-	
-	public WebReader setCachedHTML(String cachedHTML) {
-		this.cachedHTML = cachedHTML;
-		return this;
-	}
-	
 	public String getSyncHTML(String subPage) throws IOException {
 		return this.getSyncHTML(subPage, DEFAULT_TIME_OUT);
 	}
@@ -201,33 +199,5 @@ public class WebReader {
 	
 	public WebReader customQuery(String subPage, int millis, WebConsumer<HtmlPage> htmlPage) {
 		return this.customQuery(subPage, millis, true, htmlPage);
-	}
-
-	public String getUrl() {
-		return this.url;
-	}
-
-	@Override
-	public int hashCode() {
-		return Objects.hash(url, cachedHTML);
-	}
-
-	@Override
-	public boolean equals(Object o) {
-		if(this == o)
-			return true;
-		if(o == null || getClass() != o.getClass())
-			return false;
-		WebReader webReader = (WebReader) o;
-		return Objects.equals(url, webReader.url) &&
-				Objects.equals(cachedHTML, webReader.cachedHTML);
-	}
-
-	@Override
-	public String toString() {
-		return "WebReader{" +
-				"url='" + url + '\'' +
-				", cachedHTML='" + cachedHTML + '\'' +
-				'}';
 	}
 }

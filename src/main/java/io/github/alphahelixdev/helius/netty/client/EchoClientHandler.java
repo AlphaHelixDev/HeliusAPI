@@ -6,9 +6,15 @@ import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelHandlerAdapter;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.util.CharsetUtil;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
 
-import java.util.Objects;
-
+@Getter
+@EqualsAndHashCode
+@ToString
+@Setter
 public class EchoClientHandler extends ChannelHandlerAdapter {
 	
 	private ChannelHandlerContext ctx;
@@ -50,34 +56,5 @@ public class EchoClientHandler extends ChannelHandlerAdapter {
 				e.printStackTrace();
 			}
 		}
-	}
-	
-	public ChannelHandlerContext getCtx() {
-		return this.ctx;
-	}
-	
-	public EchoClientHandler setCtx(ChannelHandlerContext ctx) {
-		this.ctx = ctx;
-		return this;
-	}
-	
-	@Override
-	public int hashCode() {
-		return Objects.hash(this.getCtx());
-	}
-	
-	@Override
-	public boolean equals(Object o) {
-		if(this == o) return true;
-		if(o == null || getClass() != o.getClass()) return false;
-		EchoClientHandler that = (EchoClientHandler) o;
-		return Objects.equals(this.getCtx(), that.getCtx());
-	}
-
-	@Override
-	public String toString() {
-		return "EchoClientHandler{" +
-				"ctx=" + ctx +
-				'}';
 	}
 }
