@@ -1,7 +1,10 @@
 package io.github.alphahelixdev.helius.file.yaml;
 
+import lombok.EqualsAndHashCode;
+
 import java.io.*;
 
+@EqualsAndHashCode(callSuper = true)
 public abstract class FileConfig extends ConfigSection {
 	
 	public FileConfig() {

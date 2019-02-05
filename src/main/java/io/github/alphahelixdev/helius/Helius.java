@@ -84,7 +84,7 @@ public class Helius {
 				e.printStackTrace();
 			}
 		}
-
+		
 		startCacheClearTask();
 		Helius.getLog().info("Helius has been loaded!");
 	}

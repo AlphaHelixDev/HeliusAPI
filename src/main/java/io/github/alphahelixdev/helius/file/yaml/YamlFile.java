@@ -17,7 +17,7 @@ import java.util.Map;
 
 @Getter
 @Setter
-@EqualsAndHashCode
+@EqualsAndHashCode(callSuper = true)
 @ToString
 public class YamlFile extends FileConfig {
 	

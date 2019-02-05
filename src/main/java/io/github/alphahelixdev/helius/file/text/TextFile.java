@@ -14,7 +14,7 @@ import java.net.URI;
 
 @Getter
 @Setter
-@EqualsAndHashCode
+@EqualsAndHashCode(callSuper = false)
 @ToString
 public class TextFile extends File {
 	

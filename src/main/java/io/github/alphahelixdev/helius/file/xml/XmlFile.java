@@ -3,6 +3,7 @@ package io.github.alphahelixdev.helius.file.xml;
 import io.github.alphahelixdev.helius.Helius;
 import io.github.alphahelixdev.helius.xml.XMLObject;
 import io.github.alphahelixdev.helius.xml.XMLParser;
+import lombok.EqualsAndHashCode;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -10,6 +11,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.net.URI;
 
+@EqualsAndHashCode(callSuper = false)
 public class XmlFile extends File {
 	
 	private static final XMLParser PARSER = new XMLParser();
@@ -36,7 +38,7 @@ public class XmlFile extends File {
 	
 	public XmlFile write(String name, Object obj) {
 		return update(XmlFile.getParser()
-		                     .toXMLObject(null, name, obj));
+				.toXMLObject(null, name, obj));
 	}
 	
 	public XmlFile update(XMLObject obj) {

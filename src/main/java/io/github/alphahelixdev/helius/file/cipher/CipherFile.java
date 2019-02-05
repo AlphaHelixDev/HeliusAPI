@@ -11,7 +11,7 @@ import java.io.File;
 import java.net.URI;
 
 @Getter
-@EqualsAndHashCode
+@EqualsAndHashCode(callSuper = true)
 @ToString
 public class CipherFile extends TextFile {
 	private final HeliusCipher cipher;

@@ -20,7 +20,7 @@ import java.util.function.Consumer;
 
 @Getter
 @Setter
-@EqualsAndHashCode
+@EqualsAndHashCode(callSuper = false)
 @ToString
 public class JsonFile extends File {
 	
